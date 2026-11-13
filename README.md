@@ -17,6 +17,7 @@ Each report gives the method, every case measured and the limits:
 - [Documentation lookup](docs/measurements/documentation-lookup.md)
 - [Lockfiles and generated files](docs/measurements/lockfiles-and-generated.md)
 - [Fixed context](docs/measurements/fixed-context.md)
+- [Real agent runs on simple tasks](docs/measurements/agent-runs.md)
 
 ## Main goal
 
