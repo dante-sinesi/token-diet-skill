@@ -17,7 +17,7 @@ Every script answers `--version`. Options listed here are stable inside a major 
 | `impacto.py SYMBOL` | Definition, uses and similar existing names | `--root`, `--max-files`, `--json` |
 | `contexto.py` | Case file of a change: files, symbols, users, what to look at first, warnings | `--staged`, `--base`, `--head`, `--root`, `--json` |
 | `duplicados.py PATH...` | Repeated blocks of code | `--min-lines`, `--max`, `--ext`, `--json` |
-| `relevar.py ROOT` | Inventory of an unfamiliar project | `--top`, `--out`, `--json` |
+| `relevar.py ROOT` | Inventory of an unfamiliar project: languages, folders by weight, entry points, manifests, tests and their tools, CI, documentation, git state | `--top`, `--out`, `--json` |
 | `indexar_docs.py build \| query TERMS \| note show\|write` | Index of documents and code with the cost of opening each result; continuity note with a token cap | `--root`, `--limit`, `--text`, `--quiet` |
 
 ## Cost
