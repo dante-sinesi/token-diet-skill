@@ -24,6 +24,7 @@ import pathlib
 import shutil
 import sys
 
+import guard
 import version
 
 DEFAULT_MAX_PX = 1024
@@ -163,6 +164,11 @@ def convert(src, out_dir, max_px=DEFAULT_MAX_PX):
         hint = " (use compaction instead: converting does not shrink it)" if suffix in {".json", ".csv", ".tsv"} else ""
         return Result(str(src), "passthrough", message=f"already text, read it directly{hint}")
     is_image = suffix in IMAGE_EXTS
+    if not is_image:
+        try:
+            guard.check_size(src)
+        except ValueError as error:
+            return Result(str(src), "error", message=str(error))
     key = f"{sha256_file(src)}:{max_px if is_image else 0}"
     cache = _read_cache(out_dir)
     entry = cache.get(str(src.resolve()))
@@ -177,6 +183,9 @@ def convert(src, out_dir, max_px=DEFAULT_MAX_PX):
         raise
     except Exception as error:  # noqa: BLE001 - report any converter failure per file
         return Result(str(src), "error", message=f"{type(error).__name__}: {error}")
+    if not is_image and before is not None and after >= before:
+        pathlib.Path(output).unlink(missing_ok=True)
+        return Result(str(src), "passthrough", message="the Markdown is not smaller than the original: read the original")
     cache[str(src.resolve())] = {
         "key": key, "output": str(output), "before": before, "after": after, "warnings": warnings,
     }
