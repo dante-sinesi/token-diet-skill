@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+
+- **Removed from the skill text:** the recommendation to query the document index to answer from documents. In real runs it cost 14% more than the agent's own search when used and made no difference when left to the agent. The index and the continuity note stay as commands; the note saved 29% in the session where it was loaded at the start.
+- **Measured and documented:** HTML pages (the long-file deviation saves 68%), the strict profile (21% on a 380-line file), the continuity note, duplicated code, usage search, case file, inventory and delegation to a cheaper model (not built); see [what was tried and removed](docs/measurements/removed.md).
+
 ## 1.0.2
 
 - **Removed:** the block on heavy images and the notice on a repeated read of the same range. In real runs the native image read is already reduced, so the block cost one extra turn (+8% in dollars); the repeated-read notice never fired and saved nothing. The skill no longer recommends compacting JSON or CSV or converting images: see [what was tried and removed](docs/measurements/removed.md).

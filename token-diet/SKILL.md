@@ -13,7 +13,7 @@ Run `python scripts/NAME.py` (options and costs: `references/commands.md`):
 - Document, PDF, Word: `convertir_fuentes.py FILE`; read its output in `.token-diet/sources/`, never the original. Page or screen: `capturar.py URL_OR_FILE`.
 - Log, lockfile, minified file: `compactar.py FILE`. Test, lint or build output: `resumir.py -- COMMAND`.
 - Before reading many files: `estimar.py PATH`. Unfamiliar project: `relevar.py`. A symbol: `impacto.py SYMBOL`. A change: `contexto.py`. Repeated code: `duplicados.py`. Comment noise: `comentarios.py`.
-- Answers from documents: `indexar_docs.py query TERMS`. Continuity: `note show` at the start of a session, `note write` at the end. Documents too long or repeated: `texto.py check`; after moving text: `texto.py compare OLD NEW`.
+- Continuity: `note show` at the start of a session, `note write` at the end. Documents too long or repeated: `texto.py check`; after moving text: `texto.py compare OLD NEW`.
 - What loads every session: `consumo.py`.
 - A read was blocked: follow the command in the message; `modo.py allow PATTERN` lets one file through. Small task or strict budget: `modo.py profile light|strict`.
 

@@ -20,6 +20,18 @@ Some mechanics were built, measured against not having them, and taken out becau
 - **What was measured:** in a 3-question session over a 380-line file (4 repetitions, [Real agent runs](agent-runs.md)) the notice never fired, because the agent read the file once and answered from it; the cost was −1% against not having it.
 - **Decision:** removed in release 1.0.2: a mechanic with no measured benefit does not stay.
 
+## Document index query
+
+- **What it did:** the skill told the agent to query an index of the documents instead of searching them.
+- **What was measured:** in a folder of 40 documents with one fact to find ([Real agent runs](agent-runs.md), section 8, 4 repetitions) the cost with the skill installed was 0% against not having it, and −14% when the agent was told to build and query the index first: the agent's own search already finds a distinctive word in one call.
+- **Decision:** the query is no longer recommended by the skill (release 1.0.3). The index stays available as a command, and the continuity note, which did pay (+29%), stays.
+
+## Delegating a search to a cheaper model
+
+- **What it would do:** hand mechanical searches to a subagent on the light model and answer from its short report.
+- **What was measured:** five tasks, 4 repetitions ([Real agent runs](agent-runs.md), section 8): −2%, −29% and −18% on three searches, −1% and +44% on two tasks that need several files read. No size gave a consistent saving.
+- **Decision:** not built. The skill only keeps the rule of asking before launching agents.
+
 ## Notice on content searches
 
 - **What it did:** a content search without a limit was deviated once toward a narrower search.
