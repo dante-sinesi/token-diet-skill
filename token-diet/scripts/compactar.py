@@ -30,6 +30,7 @@ import pathlib
 import re
 import sys
 
+import guard
 import version
 
 DEFAULT_SAMPLE = 5
@@ -245,6 +246,10 @@ def compact(path, mode="auto", sample=DEFAULT_SAMPLE, context=DEFAULT_CONTEXT):
     path = pathlib.Path(path)
     if not path.is_file():
         raise CompactError("file not found")
+    try:
+        guard.check_size(path)
+    except ValueError as error:
+        raise CompactError(str(error)) from None
     chosen = pick_mode(path, mode)
     if chosen is None:
         raise CompactError("nothing to compact for this file type (use --mode to force one)")
@@ -294,8 +299,15 @@ def main(argv):
         print(f"error: {error}", file=sys.stderr)
         return 1
     source = pathlib.Path(args.file)
-    before = tokens(source.read_text(encoding="utf-8", errors="replace"))
+    original = source.read_text(encoding="utf-8", errors="replace")
+    before = tokens(original)
     after = tokens(result.text)
+    if not guard.never_worse(original, result.text):
+        if args.stdout:
+            print(original, end="")
+        else:
+            print(f"{guard.NOT_WORTH}: {source}")
+        return 0
     digest = hashlib.sha256((result.mode + result.text).encode("utf-8")).hexdigest()[:8]
     if args.stdout:
         print(result.text)

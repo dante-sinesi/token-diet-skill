@@ -17,6 +17,7 @@ import subprocess
 import sys
 import time
 
+import guard
 import version
 
 PROBLEM = re.compile(
@@ -26,6 +27,7 @@ PROBLEM = re.compile(
 )
 SUMMARY = re.compile(r"(\d+\s+(passed|failed|errors?|warnings?|tests?)|\bOK\b|Ran \d+ tests?|Build (succeeded|failed)|Finished|Tests:|Test Suites:|error summary|problems?\b)", re.I)
 TAIL = 4
+MAX_LINES = 500_000
 
 
 def tokens(text):
@@ -73,12 +75,16 @@ def run(command, timeout=600):
 
 def summarize(command, code, output, seconds, max_lines, out_dir):
     lines = output.splitlines()
+    skipped = max(0, len(lines) - MAX_LINES)
+    lines = lines[skipped:]
     digest = hashlib.sha256(output.encode("utf-8", errors="replace")).hexdigest()[:8]
     target = pathlib.Path(out_dir) / f"{pathlib.Path(command[0]).stem}-{digest}.log"
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(output, encoding="utf-8")
     shown, truncated = pick(lines, max_lines)
-    head = f"exit {code} in {seconds:.1f}s, {len(lines)} lines (~{tokens(output):,} tokens) -> full output: {target}"
+    head = f"exit {code}, {len(lines) + skipped} lines (~{tokens(output):,} tokens) -> full output: {target}"
+    if skipped:
+        head += f" (only the last {MAX_LINES:,} lines were scanned)"
     body = "\n".join(shown)
     report = head + ("\n" + body if body else "")
     if truncated:
@@ -104,7 +110,11 @@ def main(argv):
         print("error: no command after --", file=sys.stderr)
         return 2
     code, output, seconds = run(command, args.timeout)
-    report, _ = summarize(command, code, output, seconds, args.max_lines, args.out)
+    report, target = summarize(command, code, output, seconds, args.max_lines, args.out)
+    if not guard.never_worse(output, report):
+        target.unlink(missing_ok=True)
+        print(output.rstrip("\n"))
+        return code
     print(report)
     return code
 
