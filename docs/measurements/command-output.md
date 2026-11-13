@@ -35,7 +35,7 @@ Logs of 54 to 10,004 lines with one error and its stack trace; passing and faili
 | Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
 | Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
 | Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
-| Code revision | f61dcb8 |
+| Code revision | db204d2 |
 | Quality check | not run: task success was not tested; 0 of 0 tasks checked |
 | Failures and excluded cases | none excluded; all 10 cases are listed, losses included |
 | Price | not applicable: no money figure is claimed (unpriced) |

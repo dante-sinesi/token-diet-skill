@@ -19,6 +19,12 @@ import walk  # noqa: E402
 ENTRY_POINTS = {"main.py", "app.py", "manage.py", "__main__.py", "index.js", "index.ts", "server.js", "main.go", "main.rs", "index.php", "Program.cs"}
 MANIFESTS = {"package.json", "pyproject.toml", "requirements.txt", "setup.py", "composer.json", "Cargo.toml", "go.mod", "Gemfile", "pom.xml", "build.gradle", "Makefile", "Dockerfile", "docker-compose.yml"}
 TEST_MARKERS = ("test", "tests", "spec", "__tests__")
+CI_FILES = {".gitlab-ci.yml": "GitLab CI", "Jenkinsfile": "Jenkins", "azure-pipelines.yml": "Azure Pipelines", ".travis.yml": "Travis CI",
+            "bitbucket-pipelines.yml": "Bitbucket Pipelines"}
+DOC_FILES = ("README", "CHANGELOG", "CONTRIBUTING", "LICENSE", "SECURITY")
+TEST_TOOL_FILES = {"pytest.ini": "pytest", "conftest.py": "pytest", "tox.ini": "tox", "phpunit.xml": "PHPUnit", "phpunit.xml.dist": "PHPUnit",
+                   "jest.config.js": "Jest", "jest.config.ts": "Jest", "vitest.config.ts": "Vitest", "vitest.config.js": "Vitest",
+                   ".rspec": "RSpec", "karma.conf.js": "Karma", "cypress.config.js": "Cypress", "playwright.config.ts": "Playwright"}
 
 
 def _git(root, *args):
@@ -32,6 +38,7 @@ def _git(root, *args):
 def survey(root, top=8):
     root = pathlib.Path(root).resolve()
     languages, folders, files, entries, manifests, tests = {}, {}, [], [], [], set()
+    ci, docs, test_tools = set(), set(), set()
     for path in walk.iter_files(root):
         if not walk.is_text(path):
             continue
@@ -51,6 +58,24 @@ def survey(root, top=8):
             entries.append(rel)
         if path.name in MANIFESTS:
             manifests.append(rel)
+        if rel.startswith((".github/workflows/", ".circleci/")) and path.suffix in (".yml", ".yaml"):
+            ci.add("GitHub Actions" if rel.startswith(".github") else "CircleCI")
+        if path.name in CI_FILES:
+            ci.add(CI_FILES[path.name])
+        if path.name.upper().startswith(DOC_FILES) and len(parts) == 1:
+            docs.add(path.name)
+        if parts[0] in ("docs", "doc") and len(parts) > 1:
+            docs.add(parts[0] + "/")
+        if path.name in TEST_TOOL_FILES:
+            test_tools.add(TEST_TOOL_FILES[path.name])
+        if path.name.endswith("_test.go"):
+            test_tools.add("go test")
+        if path.name == "package.json" and '"test"' in text:
+            test_tools.add("npm test")
+        if path.name == "pyproject.toml" and "pytest" in text:
+            test_tools.add("pytest")
+        if path.name == "Cargo.toml":
+            test_tools.add("cargo test")
         for part in parts[:-1]:
             if part.lower() in TEST_MARKERS:
                 tests.add("/".join(parts[: parts.index(part) + 1]))
@@ -71,6 +96,9 @@ def survey(root, top=8):
         "entry_points": entries[:top],
         "manifests": manifests[:top],
         "test_folders": sorted(tests)[:top],
+        "test_tools": sorted(test_tools),
+        "ci": sorted(ci),
+        "docs": sorted(docs),
         "heaviest_files": sorted(files, key=lambda f: -f["tokens"])[:top],
         "git": git,
     }
@@ -84,7 +112,9 @@ def render(report):
         lines.append("Entry points: " + ", ".join(report["entry_points"]))
     if report["manifests"]:
         lines.append("Manifests: " + ", ".join(report["manifests"]))
-    lines.append("Tests: " + (", ".join(report["test_folders"]) if report["test_folders"] else "no test folder found"))
+    tools = f" (tools: {', '.join(report['test_tools'])})" if report["test_tools"] else ""
+    lines.append("Tests: " + (", ".join(report["test_folders"]) if report["test_folders"] else "no test folder found") + tools)
+    lines.append("CI: " + (", ".join(report["ci"]) if report["ci"] else "none found") + "; docs: " + (", ".join(report["docs"]) if report["docs"] else "none found"))
     lines.append("Heaviest files: " + ", ".join(f"{f['path']} ~{f['tokens']:,}" for f in report["heaviest_files"][:5]))
     if report["git"]:
         g = report["git"]

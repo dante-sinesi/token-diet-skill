@@ -17,13 +17,13 @@ Synthetic Python projects of 6, 40 and 200 files; for the symbol lookup, the bas
 
 | Case | Input fingerprint | Without the skill (tokens) | With the skill (tokens) | Saving |
 |---|---|---:|---:|---:|
-| 6 files: inventory | b258c1200f | 1,096 | 607 | 44% |
+| 6 files: inventory | b258c1200f | 1,096 | 615 | 43% |
 | 6 files: uses of one symbol | b258c1200f | 294 | 639 | −118% |
 | 6 files: repeated blocks | b258c1200f | 1,096 | 546 | 50% |
-| 40 files: inventory | 10eac731f1 | 7,109 | 612 | 91% |
+| 40 files: inventory | 10eac731f1 | 7,109 | 620 | 91% |
 | 40 files: uses of one symbol | 10eac731f1 | 294 | 640 | −118% |
 | 40 files: repeated blocks | 10eac731f1 | 7,109 | 588 | 91% |
-| 200 files: inventory | 7275521eb8 | 36,249 | 614 | 98% |
+| 200 files: inventory | 7275521eb8 | 36,249 | 622 | 98% |
 | 200 files: uses of one symbol | 7275521eb8 | 294 | 641 | −119% |
 | 200 files: repeated blocks | 7275521eb8 | 36,249 | 804 | 97% |
 
@@ -34,7 +34,7 @@ Synthetic Python projects of 6, 40 and 200 files; for the symbol lookup, the bas
 | Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
 | Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
 | Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
-| Code revision | f61dcb8 |
+| Code revision | db204d2 |
 | Quality check | not run: task success was not tested; 0 of 0 tasks checked |
 | Failures and excluded cases | none excluded; all 9 cases are listed, losses included |
 | Price | not applicable: no money figure is claimed (unpriced) |
