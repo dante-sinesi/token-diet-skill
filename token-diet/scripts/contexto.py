@@ -14,6 +14,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import version  # noqa: E402
 import impacto  # noqa: E402
 import walk  # noqa: E402
 
@@ -133,6 +134,7 @@ def render(report):
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Case file for a change.")
+    parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("--staged", action="store_true")
     parser.add_argument("--base")
     parser.add_argument("--head")

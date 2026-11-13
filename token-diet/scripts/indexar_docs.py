@@ -29,6 +29,7 @@ import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import version  # noqa: E402
 import impacto  # noqa: E402
 import modo  # noqa: E402
 import walk  # noqa: E402
@@ -271,6 +272,7 @@ def note_write(root, text):
 
 def main(argv, stdin=None):
     parser = argparse.ArgumentParser(description="Index and concept map of a project.")
+    parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("command", choices=["build", "query", "note"])
     parser.add_argument("rest", nargs="*")
     parser.add_argument("--root")

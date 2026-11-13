@@ -13,6 +13,7 @@ import subprocess
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import version  # noqa: E402
 import walk  # noqa: E402
 
 ENTRY_POINTS = {"main.py", "app.py", "manage.py", "__main__.py", "index.js", "index.ts", "server.js", "main.go", "main.rs", "index.php", "Program.cs"}
@@ -95,6 +96,7 @@ def render(report):
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Inventory of a system before reading it.")
+    parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("root", nargs="?", default=".")
     parser.add_argument("--top", type=int, default=8)
     parser.add_argument("--out")

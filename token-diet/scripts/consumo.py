@@ -24,6 +24,7 @@ import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import version  # noqa: E402
 import modo  # noqa: E402
 
 DESC_MAX_CHARS = 800
@@ -201,6 +202,7 @@ def render(report):
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Audit what is loaded in every session.")
+    parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("--root", default=".")
     parser.add_argument("--home", default=str(pathlib.Path.home()))
     parser.add_argument("--repo")

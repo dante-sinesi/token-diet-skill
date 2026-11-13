@@ -15,6 +15,7 @@ import pathlib
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import version  # noqa: E402
 import walk  # noqa: E402
 
 
@@ -61,6 +62,7 @@ def render(report, top, budget=None):
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Estimate the token cost of reading some paths.")
+    parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("paths", nargs="*", default=["."])
     parser.add_argument("--depth", type=int, default=1)
     parser.add_argument("--top", type=int, default=10)

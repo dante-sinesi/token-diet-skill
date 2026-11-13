@@ -17,6 +17,8 @@ import subprocess
 import sys
 import time
 
+import version
+
 PROBLEM = re.compile(
     r"(\bFAIL(?:ED|URE|S)?\b|\bERROR(?:S)?\b|\bFatal\b|Traceback \(most recent call last\)|AssertionError|\bpanic\b|"
     r"error[:\[ ]|\bwarning\b|\bWARN\b|\bException\b|✗|✖|npm ERR!|Cannot find|not found|undefined reference)",
@@ -85,6 +87,9 @@ def summarize(command, code, output, seconds, max_lines, out_dir):
 
 
 def main(argv):
+    if argv[:1] == ["--version"]:
+        print(version.label())
+        return 0
     if "--" not in argv:
         print("usage: resumir.py [--max-lines N] [--timeout S] [--out DIR] -- COMMAND [ARGS ...]", file=sys.stderr)
         return 2

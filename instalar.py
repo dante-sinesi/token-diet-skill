@@ -28,6 +28,15 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent
 SOURCE = ROOT / "token-diet"
+
+
+def source_version():
+    try:
+        return (SOURCE / "VERSION").read_text(encoding="utf-8").strip()
+    except OSError:
+        return "unknown"
+
+
 SKILL_NAME = "token-diet"
 MANIFEST = ".install.json"
 BACKUP = "settings.json.token-diet.bak"
@@ -126,6 +135,7 @@ def install(home, note_hook=True):
     hooks = hook_commands(home, note_hook)
     (target / MANIFEST).write_text(json.dumps({
         "source": str(ROOT),
+        "version": source_version(),
         "installed_at": datetime.datetime.now().isoformat(timespec="seconds"),
         "files": file_hashes(target),
         "hooks": sorted(hooks),
@@ -197,13 +207,14 @@ def check(home, note_hook=True):
 def main(argv):
     parser = argparse.ArgumentParser(description="Install Token Diet as a Claude Code skill.")
     parser.add_argument("command", choices=["install", "check", "uninstall"])
+    parser.add_argument("--version", action="version", version=f"token-diet {source_version()}")
     parser.add_argument("--home", default=str(pathlib.Path.home()))
     parser.add_argument("--no-note-hook", action="store_true")
     args = parser.parse_args(argv)
     try:
         if args.command == "install":
             result = install(args.home, not args.no_note_hook)
-            print(f"installed {result['files']} files in {result['target']}")
+            print(f"installed token-diet {source_version()}: {result['files']} files in {result['target']}")
             print("hooks registered: " + ", ".join(result["hooks"]))
             return 0
         if args.command == "uninstall":

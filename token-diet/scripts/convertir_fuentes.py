@@ -24,6 +24,8 @@ import pathlib
 import shutil
 import sys
 
+import version
+
 DEFAULT_MAX_PX = 1024
 API_IMAGE_CAP_PX = 1568
 MIN_TEXT_CHARS = 200
@@ -208,6 +210,7 @@ def describe(result):
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Convert documents to Markdown and shrink images.")
+    parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("paths", nargs="+")
     parser.add_argument("--out", default=os.environ.get("TOKEN_DIET_SOURCES_DIR", ".token-diet/sources"))
     parser.add_argument("--max-px", type=int, default=DEFAULT_MAX_PX)
