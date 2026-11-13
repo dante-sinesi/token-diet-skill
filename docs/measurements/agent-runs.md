@@ -122,12 +122,27 @@ Three tasks that invite them: a test run with 12,000 lines of output and three f
 - **The agent never called the skill or any of its commands:** 0 activations and 0 commands in 18 calls of the arms that have the skill. It filtered the output with its own search, read the saved output file, or counted in the lockfile with a short script, for about $0.04 to $0.06 a task.
 - **The differences between arms are the path the agent happened to choose** (for example fewer turns in the lockfile task of the *skill* arm), not the use of the skill: the skill was not used in them.
 
+## 6. Fixed context: a bloated instruction file against the same facts trimmed
+
+A project instruction file with the same 12 facts in three versions: trimmed (about 106 tokens), bloated to about 10,000 tokens and to about 40,000 tokens with repeated decisions and separators. One session of 5 questions that only the file can answer, 3 repetitions per version.
+
+| Version | Dollars per session (median) | Turns | Context per turn | Success |
+|---|---:|---:|---:|---:|
+| trimmed (about 106 tokens) | 0.259 | 5 | 32,911 | 3/3 |
+| bloated-10k (about 10,064 tokens) | 0.472 | 5 | 43,034 | 3/3 |
+| bloated-40k (about 40,061 tokens) | 1.108 | 5 | 73,338 | 3/3 |
+
+- **Every turn pays the fixed context again.** The 10,000-token file costs 82% more per session than the trimmed one, and the 40,000-token file about 4.3 times as much; all answers were correct.
+- **Saving of trimming, with the skill's own cost charged** (its 76-token description paid on every turn at the rate this run implies, 0.0016 dollars per session): 44% from 10,000 tokens and 76% from 40,000 tokens, rounded down.
+- **What this does and does not show.** It shows what the fixed context costs and what trimming it is worth. The trimming here was done by hand to the result the audit command points to (repetition and history removed, every fact kept); the agent did not trim anything, and a real file has facts that are harder to separate from the noise.
+
 ## What it shows
 
 1. **The skill does not help on small tasks and does not cost either.** Its description is below the noise in every task.
 2. **It helps where the agent's native way is expensive:** a PDF read whole, a long file read whole.
 3. **It does not help where the agent already has a cheap way:** searching a file, filtering command output, counting in a lockfile, reading an image, opening Word or Excel with its shell. Even when the task invites the skill's commands, the agent does not call them.
-4. **Mechanics that did not pay were removed** (releases 1.0.1 and 1.0.2), see [what was tried and removed](removed.md).
+4. **The fixed context is where the bill grows:** every turn pays it again, and trimming a bloated instruction file is worth 44% to 76% of a session's cost in section 6.
+5. **Mechanics that did not pay were removed** (releases 1.0.1 and 1.0.2), see [what was tried and removed](removed.md).
 
 ## Evidence
 
