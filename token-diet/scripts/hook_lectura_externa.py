@@ -99,8 +99,41 @@ def _read_cap_message(payload, root, path, tool_input):
     return modo.build_message(reason, alternative, 1, "repeat the same Read and it goes through")
 
 
+def _grep_message(payload, root, tool_input):
+    """Soft block, once per search and session: content search without a limit goes cheap first."""
+    if tool_input.get("output_mode") != "content" or tool_input.get("head_limit"):
+        return None
+    session = str(payload.get("session_id") or "none")
+    key = f"grep:{session}:{tool_input.get('pattern', '')}:{tool_input.get('path', '')}"
+    if modo.register_block(root, key) > 1:
+        return None
+    reason = "A content search with no head_limit can return thousands of lines."
+    alternative = "run it as output_mode files_with_matches (or count) first to see where it matches, or add head_limit (for example 50)"
+    return modo.build_message(reason, alternative, 1, "repeat the same search and it runs")
+
+
+def _reread_message(payload, root, path, tool_input):
+    """Soft block, once: the same unchanged range of a file read again in the same session."""
+    try:
+        stat = path.stat()
+    except OSError:
+        return None
+    session = str(payload.get("session_id") or "none")
+    key = f"seen:{session}:{path}:{stat.st_mtime_ns}:{stat.st_size}:{tool_input.get('offset') or 0}:{tool_input.get('limit') or 0}"
+    if modo.register_block(root, key) != 2:
+        return None
+    reason = f"{path.name} was already read in this session and has not changed: its text is in the conversation."
+    alternative = "use what you read; if you need another part, read that range (offset and limit) or search the file"
+    return modo.build_message(reason, alternative, 1, "repeat the same Read and it goes through")
+
+
 def decide(payload, root):
     """Returns the blocking message, or None to let the read through."""
+    if payload.get("tool_name") == "Grep":
+        tool_input = payload.get("tool_input") or {}
+        if modo.direct_read_allowed(root, tool_input.get("path") or "."):
+            return None
+        return _grep_message(payload, root, tool_input)
     if payload.get("tool_name") != "Read":
         return None
     raw = (payload.get("tool_input") or {}).get("file_path")
@@ -115,7 +148,12 @@ def decide(payload, root):
     if modo.direct_read_allowed(root, path):
         return None
     if suffix not in DOC_EXTS and suffix not in IMAGE_EXTS and not generated:
-        return _read_cap_message(payload, root, path, payload.get("tool_input") or {})
+        tool_input = payload.get("tool_input") or {}
+        message = _read_cap_message(payload, root, path, tool_input)
+        state = modo.state_dir(root)
+        if message or not path.is_file() or state == path or state in path.parents:
+            return message
+        return _reread_message(payload, root, path, tool_input)
     sources = modo.sources_dir(root)
     if sources == path or sources in path.parents:
         return None
