@@ -59,6 +59,46 @@ def _image_is_heavy(path, max_px=MAX_IMAGE_PX):
     return path.stat().st_size > FALLBACK_IMAGE_BYTES
 
 
+def _lines_above(path, cap):
+    """Line count of a text file when it is above `cap` (stops counting there), else 0."""
+    try:
+        with open(path, "rb") as handle:
+            if b"\0" in handle.read(2048):
+                return 0
+            handle.seek(0)
+            count = 0
+            for count, _ in enumerate(handle, 1):
+                if count > cap:
+                    break
+            else:
+                return 0
+            return sum(1 for _ in handle) + count
+    except OSError:
+        return 0
+
+
+def _read_cap_message(payload, root, path, tool_input):
+    """Soft block, once per file and session: a long file read whole gets the way to read a range."""
+    if tool_input.get("offset") or tool_input.get("limit"):
+        return None
+    state = modo.state_dir(root)
+    if state == path or state in path.parents or not path.is_file():
+        return None
+    cap = modo.profile_value(root, "read_cap_lines")
+    lines = _lines_above(path, cap)
+    if not lines:
+        return None
+    session = str(payload.get("session_id") or "none")
+    count = modo.register_block(root, f"cap:{session}:{path}")
+    if count > 1:
+        return None
+    tokens = max(1, path.stat().st_size // 4)
+    reason = f"{path.name} has {lines:,} lines (about {tokens:,} tokens): reading all of it is rarely needed."
+    alternative = (f"read a range (Read with offset 1 and limit {cap}), find the part with "
+                   f'python "{HERE / "indexar_docs.py"}" query TERMS, or compact it with python "{HERE / "compactar.py"}" "{path}"')
+    return modo.build_message(reason, alternative, 1, "repeat the same Read and it goes through")
+
+
 def decide(payload, root):
     """Returns the blocking message, or None to let the read through."""
     if payload.get("tool_name") != "Read":
@@ -72,10 +112,10 @@ def decide(payload, root):
     path = path.resolve()
     suffix = path.suffix.lower()
     generated = _is_generated(path)
-    if suffix not in DOC_EXTS and suffix not in IMAGE_EXTS and not generated:
-        return None
     if modo.direct_read_allowed(root, path):
         return None
+    if suffix not in DOC_EXTS and suffix not in IMAGE_EXTS and not generated:
+        return _read_cap_message(payload, root, path, payload.get("tool_input") or {})
     sources = modo.sources_dir(root)
     if sources == path or sources in path.parents:
         return None
