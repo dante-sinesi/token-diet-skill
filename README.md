@@ -22,14 +22,6 @@ Each report gives the method, every case measured and the limits:
 - [Real agent runs](docs/measurements/agent-runs.md)
 - [Tried, measured and removed](docs/measurements/removed.md): what did not pay for itself, with the measurement behind each decision
 
-## Main goal
-
-The main goal is that, when the time comes, the `senior` skill sheds everything Token Diet already covers.
-
-- When a Token Diet token-saving mechanic covers the same or more than the one in `senior`, `senior` drops its own.
-- From then on `senior` depends on Token Diet being always installed, because without it `senior` would consume too much.
-- Direction of the dependency: `senior` will depend on Token Diet; Token Diet will never depend on `senior`.
-
 ## Usage
 
 Every script lives in `token-diet/scripts/` and answers `--version`. The options listed here are stable: they do not change inside a major version, and new ones may be added.
