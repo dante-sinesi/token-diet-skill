@@ -103,6 +103,10 @@ def decide(payload, root):
 def run(stdin_text, stdout, stderr, root=None):
     """Hook entry point; returns the exit code."""
     fallback = root or modo.project_root()
+    for problem in modo.installation_problems(HERE):
+        modo.log_note(fallback, "hook_lectura_externa", f"integrity: {problem}; the hook keeps working, run instalar.py check")
+        if modo.debug_enabled():
+            stderr.write(f"integrity: {problem}\n")
     try:
         payload = json.loads(stdin_text or "{}")
         message = decide(payload, root or modo.project_root(payload.get("cwd")))

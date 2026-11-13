@@ -17,6 +17,7 @@ Command line:
   python modo.py profile [light|standard|strict]   show or choose the diet profile (thresholds of the other tools)
 """
 import fnmatch
+import hashlib
 import json
 import os
 import pathlib
@@ -136,6 +137,39 @@ def log_error(root, hook):
         folder.mkdir(parents=True, exist_ok=True)
         with open(folder / "hook-errors.log", "a", encoding="utf-8") as handle:
             handle.write(f"[{hook}]\n{traceback.format_exc()}\n")
+    except OSError:
+        pass
+
+
+HOOK_FILES = ("hook_lectura_externa.py", "modo.py", "version.py")
+
+
+def installation_problems(scripts_dir):
+    """Hook files that differ from what the installer wrote (empty when not installed from a manifest)."""
+    scripts_dir = pathlib.Path(scripts_dir)
+    try:
+        files = json.loads((scripts_dir.parent / ".install.json").read_text(encoding="utf-8"))["files"]
+    except (OSError, ValueError, KeyError):
+        return []
+    problems = []
+    for name in HOOK_FILES:
+        expected = files.get(f"scripts/{name}")
+        try:
+            actual = hashlib.sha256((scripts_dir / name).read_bytes()).hexdigest()
+        except OSError:
+            problems.append(f"scripts/{name} is missing")
+            continue
+        if expected and actual != expected:
+            problems.append(f"scripts/{name} was edited after the install")
+    return problems
+
+
+def log_note(root, hook, text):
+    try:
+        folder = state_dir(root)
+        folder.mkdir(parents=True, exist_ok=True)
+        with open(folder / "hook-errors.log", "a", encoding="utf-8") as handle:
+            handle.write(f"[{hook}] {text}\n")
     except OSError:
         pass
 
