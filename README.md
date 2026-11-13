@@ -34,7 +34,7 @@ Every script lives in `token-diet/scripts/` and answers `--version`. The options
 |---|---|---|
 | `convertir_fuentes.py FILE...` | Documents to Markdown, images to 1024 px; read the output in `.token-diet/sources/`, never the originals | `--out`, `--max-px`, `--json` |
 | `capturar.py URL_OR_FILE` | Headless screenshot of a page or file, reduced to 1024 px | `--out`, `--max-px`, `--width`, `--height`, `--json` |
-| `consumo.py` | Audits what loads every session and says what to trim first | `--root`, `--home`, `--repo`, `--json`, `--out` |
+| `consumo.py` | Audits what loads every session and says what to trim first; `--repo` adds a repository's skills, `--only-repo` measures them instead of the installed ones | `--root`, `--home`, `--repo`, `--only-repo`, `--json`, `--out` |
 | `compactar.py FILE` | Compacts JSON, CSV, logs, lockfiles and generated files and says what it may have lost | `--mode`, `--sample`, `--context`, `--out`, `--stdout`, `--lines A-B` |
 | `resumir.py -- COMMAND` | Runs a test, lint or build command and returns only the lines that matter | `--max-lines`, `--timeout`, `--out` |
 | `texto.py check \| compare OLD NEW` | Documents above their line cap, paragraphs repeated between documents, and what a moved or trimmed text lost | `--root`, `--min-chars`, `--json` |

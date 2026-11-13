@@ -1,6 +1,6 @@
 """Audits what is loaded in every session and says what to trim first.
 
-Usage: python consumo.py [--root DIR] [--home DIR] [--repo DIR] [--json] [--out FILE]
+Usage: python consumo.py [--root DIR] [--home DIR] [--repo DIR [--only-repo]] [--json] [--out FILE]
 
 Fixed cost (paid every session): skill names and descriptions, CLAUDE.md files, the
 memory index and any extra file listed in .token-diet/config.json under "always_loaded".
@@ -12,6 +12,8 @@ tokens, memory index 200 lines, MCP servers 3.
 
 --repo DIR audits the skills found in a repository as if they were installed (a skill
 with the same name replaces the installed one), so you see the effect without installing.
+--only-repo (with --repo) measures the repository skills INSTEAD of the installed ones, to see the effect of a
+trim before reinstalling; the report says the fixed cost with the installed skills and with the repository ones.
 --out FILE also writes the report to FILE.
 
 Exit codes: 0 nothing over a limit, 1 something over a limit.
@@ -141,10 +143,10 @@ def mcp_servers(home, root):
     return sorted(names)
 
 
-def _audit(root, home, repo):
+def _audit(root, home, repo, only_repo=False):
     root, home = pathlib.Path(root).resolve(), pathlib.Path(home)
     skills = {}
-    for base in (home / ".claude" / "skills", root / ".claude" / "skills"):
+    for base in (() if only_repo else (home / ".claude" / "skills", root / ".claude" / "skills")):
         skills.update(find_skills(base))
     if repo:
         skills.update(repo_skills(repo))
@@ -198,10 +200,18 @@ def _audit(root, home, repo):
     }
 
 
-def audit(root, home, repo=None):
-    report = _audit(root, home, repo)
+def audit(root, home, repo=None, only_repo=False):
+    if only_repo and not repo:
+        raise ValueError("--only-repo needs --repo DIR")
+    report = _audit(root, home, repo, only_repo)
     if repo:
-        report["repo_effect"] = {"fixed_tokens_added": report["fixed_tokens"] - _audit(root, home, None)["fixed_tokens"]}
+        installed = _audit(root, home, None)["fixed_tokens"]
+        effect = {"fixed_tokens_added": report["fixed_tokens"] - installed}
+        if only_repo:
+            effect.update({"mode": "only_repo", "installed_fixed_tokens": installed, "repo_fixed_tokens": report["fixed_tokens"],
+                           "installed_skills": len(find_skills(pathlib.Path(home) / ".claude" / "skills")),
+                           "repo_skills": len(repo_skills(repo))})
+        report["repo_effect"] = effect
     return report
 
 
@@ -215,8 +225,13 @@ def render(report):
     settings = report.get("settings", {})
     lines.append(f"Settings: {settings.get('hooks', 0)} hooks, {settings.get('permission_rules', 0)} permission rules, "
                  f"{len(report['mcp_servers'])} MCP servers (tool definitions not counted)")
-    if report["repo_effect"]:
-        lines.append(f"--repo: the repository skills add ~{report['repo_effect']['fixed_tokens_added']:,} fixed tokens")
+    effect = report["repo_effect"]
+    if effect and effect.get("mode") == "only_repo":
+        delta = effect["fixed_tokens_added"]
+        lines.append(f"--only-repo: the {effect['repo_skills']} repository skills replace the {effect['installed_skills']} installed ones: "
+                     f"~{effect['repo_fixed_tokens']:,} fixed tokens instead of ~{effect['installed_fixed_tokens']:,} ({delta:+,})")
+    elif effect:
+        lines.append(f"--repo: the repository skills add ~{effect['fixed_tokens_added']:,} fixed tokens")
     if report["problems"]:
         lines.append("Over the limit:")
         lines += [f"  - {problem}" for problem in report["problems"]]
@@ -236,10 +251,13 @@ def main(argv):
     parser.add_argument("--root", default=".")
     parser.add_argument("--home", default=str(pathlib.Path.home()))
     parser.add_argument("--repo")
+    parser.add_argument("--only-repo", action="store_true", help="with --repo: measure the repository skills instead of the installed ones")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--out")
     args = parser.parse_args(argv)
-    report = audit(args.root, args.home, args.repo)
+    if args.only_repo and not args.repo:
+        parser.error("--only-repo needs --repo DIR")
+    report = audit(args.root, args.home, args.repo, args.only_repo)
     output = json.dumps(report, indent=1) if args.json else render(report)
     print(output)
     if args.out:
