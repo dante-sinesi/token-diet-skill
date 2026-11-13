@@ -40,10 +40,12 @@ python token-diet/scripts/indexar_docs.py query hook blocks
 
 `convertir_fuentes.py` writes Markdown and reduced images to `.token-diet/sources/`; read those, never the originals (`--max-px N` asks for a larger image). `consumo.py` audits what is loaded every session and says what to trim first; `--repo` adds the skills of a repository without installing them. `compactar.py` shrinks JSON (to a table when the rows are uniform), logs (WARN and ERROR with context, `--lines A-B` reads the original), lockfiles and generated files, and says what it may have lost. `resumir.py` runs a test, lint or build command and returns only the lines that matter; `contexto.py` gives the case file of a change (what it touches, who uses it, what to look at first); `estimar.py`, `relevar.py`, `impacto.py` and `duplicados.py` size, map and search a project without reading it. `indexar_docs.py` indexes documents and code symbols and answers a query with the section to open and what opening it costs; its `note` command keeps a continuity note with a token cap so a new session resumes without re-explaining the project.
 
-To make the conversion mandatory, register the hook in `.claude/settings.json`. It blocks a `Read` of a PDF, Office document, image larger than 1024 px, or big lockfile or generated file, and gives the exact command:
+To make the conversion mandatory and the continuity note automatic, install the skill and its hooks:
 
-```json
-{"hooks": {"PreToolUse": [{"matcher": "Read", "hooks": [{"type": "command", "command": "python /path/to/token-diet/scripts/hook_lectura_externa.py"}]}]}}
+```bash
+python instalar.py install
 ```
+
+It copies the skill to `~/.claude/skills/token-diet/` and registers two hooks in `~/.claude/settings.json` (a backup is kept and the rest of the file is untouched): one blocks a `Read` of a PDF, Office document, image larger than 1024 px, or big lockfile or generated file and gives the exact command; the other loads the continuity note at the start of a session. `python instalar.py check` says whether the installed copy still matches this repository and `python instalar.py uninstall` removes both.
 
 Emergency exits: `python token-diet/scripts/modo.py allow PATTERN` for one file, or `TOKEN_DIET_LECTURA_DIRECTA=1` for everything. A broken hook allows the read and logs the error in `.token-diet/hook-errors.log` (`TOKEN_DIET_HOOK_DEPURAR=1` shows it).
