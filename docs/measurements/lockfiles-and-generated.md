@@ -17,9 +17,9 @@ Synthetic package-lock.json files with 50, 400 and 3,000 packages.
 
 | Case | Input fingerprint | Without the skill (tokens) | With the skill (tokens) | Saving |
 |---|---|---:|---:|---:|
-| package-lock.json, 50 packages | a215a697dc | 3,426 | 639 | 81% |
-| package-lock.json, 400 packages | 211e39ceef | 27,376 | 639 | 97% |
-| package-lock.json, 3,000 packages | c92b5392e2 | 206,476 | 639 | 99% |
+| package-lock.json, 50 packages | a215a697dc | 3,426 | 650 | 81% |
+| package-lock.json, 400 packages | 211e39ceef | 27,376 | 650 | 97% |
+| package-lock.json, 3,000 packages | c92b5392e2 | 206,476 | 650 | 99% |
 
 ## Evidence
 
@@ -28,7 +28,7 @@ Synthetic package-lock.json files with 50, 400 and 3,000 packages.
 | Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
 | Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
 | Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
-| Code revision | b5b01c3 |
+| Code revision | 038810f |
 | Quality check | not run: task success was not tested; 0 of 0 tasks checked |
 | Failures and excluded cases | none excluded; all 3 cases are listed, losses included |
 | Price | not applicable: no money figure is claimed (unpriced) |
@@ -37,7 +37,7 @@ Synthetic package-lock.json files with 50, 400 and 3,000 packages.
 ## Why this measurement can be trusted
 
 - **Both sides come from real files and real tool output.** The "without the skill" figure is the size of the input Claude would read; the "with the skill" figure is the size of what the tool printed for that same input. Nothing is modeled except the token estimate itself.
-- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (338 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
+- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (349 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
 - **The "no skill" side uses no resource of the skill at all.** It is a plain read, with no conversion, no summary and no index.
 - **Every case is listed, including the ones where the skill loses.** The range is the minimum and the maximum of all the cases, rounded down.
 - **The inputs are fixed and described**, so the numbers do not depend on a model's sampling and can be recomputed.

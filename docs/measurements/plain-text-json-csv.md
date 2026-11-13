@@ -21,10 +21,10 @@ Plain text from 0.5 KB to 500 KB; JSON with 30 and 300 uniform rows and a nested
 | plain text, 5,000 bytes | c959411832 | 1,250 | 1,329 | −7% |
 | plain text, 50,000 bytes | f199c6c2e1 | 12,500 | 12,579 | −1% |
 | plain text, 500,000 bytes | 1a0ff0bb20 | 125,000 | 125,079 | −1% |
-| JSON, 30 uniform rows | 7cf9674ef7 | 740 | 775 | −5% |
-| JSON, 300 uniform rows | c1249e9f6d | 7,606 | 3,928 | 48% |
-| JSON, nested configuration | 901b9ec329 | 3,308 | 2,224 | 32% |
-| CSV, 500 rows | 7dca42b1cd | 1,981 | 504 | 74% |
+| JSON, 30 uniform rows | 7cf9674ef7 | 740 | 786 | −7% |
+| JSON, 300 uniform rows | c1249e9f6d | 7,606 | 3,939 | 48% |
+| JSON, nested configuration | 901b9ec329 | 3,308 | 2,235 | 32% |
+| CSV, 500 rows | 7dca42b1cd | 1,981 | 515 | 74% |
 
 ## Evidence
 
@@ -33,7 +33,7 @@ Plain text from 0.5 KB to 500 KB; JSON with 30 and 300 uniform rows and a nested
 | Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
 | Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
 | Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
-| Code revision | b5b01c3 |
+| Code revision | 038810f |
 | Quality check | not run: task success was not tested; 0 of 0 tasks checked |
 | Failures and excluded cases | none excluded; all 8 cases are listed, losses included |
 | Price | not applicable: no money figure is claimed (unpriced) |
@@ -42,7 +42,7 @@ Plain text from 0.5 KB to 500 KB; JSON with 30 and 300 uniform rows and a nested
 ## Why this measurement can be trusted
 
 - **Both sides come from real files and real tool output.** The "without the skill" figure is the size of the input Claude would read; the "with the skill" figure is the size of what the tool printed for that same input. Nothing is modeled except the token estimate itself.
-- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (338 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
+- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (349 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
 - **The "no skill" side uses no resource of the skill at all.** It is a plain read, with no conversion, no summary and no index.
 - **Every case is listed, including the ones where the skill loses.** The range is the minimum and the maximum of all the cases, rounded down.
 - **The inputs are fixed and described**, so the numbers do not depend on a model's sampling and can be recomputed.

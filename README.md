@@ -2,7 +2,7 @@
 
 ## Expected savings
 
-<p align="center"><img src="docs/img/savings.svg" alt="Expected saving versus no skill, by aspect" width="760"><br><sub>Expected targets for the saving versus using no skill at all, net of the skill's own cost; these are not results. Real data today (estimates from runs on sample inputs, no agent runs; negative means the skill costs more than it saves): Documents (HTML only) 57% to 70%; Images −21% to 32%; Plain text, JSON, CSV −64% to 74%; Command output −35% to 99%; Code exploration −91% to 98%; Change review 31% to 88%; Documentation lookup 61% to 90%; Lockfiles and generated 81% to 99%; Fixed context −30% to 42%.</sub></p>
+<p align="center"><img src="docs/img/savings.svg" alt="Expected saving versus no skill, by aspect" width="760"><br><sub>Expected targets for the saving versus using no skill at all, net of the skill's own cost; these are not results. Real data today (estimates from runs on sample inputs, no agent runs; negative means the skill costs more than it saves): Documents (HTML only) 57% to 70%; Images −21% to 32%; Plain text, JSON, CSV −64% to 74%; Command output −37% to 99%; Code exploration −94% to 98%; Change review 30% to 88%; Documentation lookup 61% to 90%; Lockfiles and generated 81% to 99%; Fixed context −31% to 42%.</sub></p>
 
 ## Measurements
 
@@ -33,6 +33,7 @@ Every script lives in `token-diet/scripts/` and answers `--version`. The options
 | Command | What it does | Stable options |
 |---|---|---|
 | `convertir_fuentes.py FILE...` | Documents to Markdown, images to 1024 px; read the output in `.token-diet/sources/`, never the originals | `--out`, `--max-px`, `--json` |
+| `capturar.py URL_OR_FILE` | Headless screenshot of a page or file, reduced to 1024 px | `--out`, `--max-px`, `--width`, `--height`, `--json` |
 | `consumo.py` | Audits what loads every session and says what to trim first | `--root`, `--home`, `--repo`, `--json`, `--out` |
 | `compactar.py FILE` | Compacts JSON, CSV, logs, lockfiles and generated files and says what it may have lost | `--mode`, `--sample`, `--context`, `--out`, `--stdout`, `--lines A-B` |
 | `resumir.py -- COMMAND` | Runs a test, lint or build command and returns only the lines that matter | `--max-lines`, `--timeout`, `--out` |

@@ -5,6 +5,7 @@ Every script answers `--version`. Options listed here are stable inside a major 
 | Script | Use | Options |
 |---|---|---|
 | `convertir_fuentes.py FILE...` | Documents to Markdown (cached by hash, warns when text may have been lost); images to 1024 px on the long side, never enlarged, EXIF respected. Plain text, JSON and CSV are left alone | `--out`, `--max-px`, `--json` |
+| `capturar.py URL_OR_FILE` | Headless screenshot (Edge, Chrome or Chromium installed on the machine, or `TOKEN_DIET_BROWSER`) already reduced to 1024 px; the raw capture stays under `<out>/raw` | `--out`, `--max-px`, `--width`, `--height`, `--json` |
 | `hook_lectura_externa.py` | Pre-read hook: blocks PDF, Office, images over 1024 px and big lockfiles or generated files, and gives the exact command. Registered by `instalar.py` | `--version` |
 | `modo.py allow PATTERN \| show` | Emergency exit for the hook; `TOKEN_DIET_LECTURA_DIRECTA=1` disables every block | none |
 | `consumo.py` | Fixed cost per session against limits, what to trim first; `--repo DIR` audits a repository without installing it | `--root`, `--home`, `--repo`, `--json`, `--out` |
