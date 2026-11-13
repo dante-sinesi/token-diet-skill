@@ -15,16 +15,29 @@ Plain text from 0.5 KB to 500 KB; JSON with 30 and 300 uniform rows and a nested
 
 ## Cases
 
-| Case | Without the skill (tokens) | With the skill (tokens) | Saving |
-|---|---:|---:|---:|
-| plain text, 500 bytes | 125 | 204 | −64% |
-| plain text, 5,000 bytes | 1,250 | 1,329 | −7% |
-| plain text, 50,000 bytes | 12,500 | 12,579 | −1% |
-| plain text, 500,000 bytes | 125,000 | 125,079 | −1% |
-| JSON, 30 uniform rows | 740 | 775 | −5% |
-| JSON, 300 uniform rows | 7,606 | 3,928 | 48% |
-| JSON, nested configuration | 3,308 | 2,224 | 32% |
-| CSV, 500 rows | 1,981 | 504 | 74% |
+| Case | Input fingerprint | Without the skill (tokens) | With the skill (tokens) | Saving |
+|---|---|---:|---:|---:|
+| plain text, 500 bytes | 8cff711dc2 | 125 | 204 | −64% |
+| plain text, 5,000 bytes | c959411832 | 1,250 | 1,329 | −7% |
+| plain text, 50,000 bytes | f199c6c2e1 | 12,500 | 12,579 | −1% |
+| plain text, 500,000 bytes | 1a0ff0bb20 | 125,000 | 125,079 | −1% |
+| JSON, 30 uniform rows | 7cf9674ef7 | 740 | 775 | −5% |
+| JSON, 300 uniform rows | c1249e9f6d | 7,606 | 3,928 | 48% |
+| JSON, nested configuration | 901b9ec329 | 3,308 | 2,224 | 32% |
+| CSV, 500 rows | 7dca42b1cd | 1,981 | 504 | 74% |
+
+## Evidence
+
+| Field | Value |
+|---|---|
+| Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
+| Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
+| Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
+| Code revision | 45797db |
+| Quality check | not run: task success was not tested; 0 of 0 tasks checked |
+| Failures and excluded cases | none excluded; all 8 cases are listed, losses included |
+| Price | not applicable: no money figure is claimed (unpriced) |
+| Scope | only these inputs and this counter; it does not extend to other models, providers, tasks or dates |
 
 ## Why this measurement can be trusted
 

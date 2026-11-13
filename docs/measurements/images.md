@@ -15,15 +15,28 @@ Seven image sizes from 640x480 to 4000x3000 px.
 
 ## Cases
 
-| Case | Without the skill (tokens) | With the skill (tokens) | Saving |
-|---|---:|---:|---:|
-| 640x480 px | 410 | 489 | −20% |
-| 800x600 px | 640 | 719 | −13% |
-| 1024x768 px | 1,049 | 1,128 | −8% |
-| 1200x800 px | 1,280 | 1,537 | −21% |
-| 1568x1045 px | 2,185 | 1,536 | 29% |
-| 3000x2000 px | 2,185 | 1,537 | 29% |
-| 4000x3000 px | 2,459 | 1,653 | 32% |
+| Case | Input fingerprint | Without the skill (tokens) | With the skill (tokens) | Saving |
+|---|---|---:|---:|---:|
+| 640x480 px | e81dd57ce8 | 410 | 489 | −20% |
+| 800x600 px | b01093be75 | 640 | 719 | −13% |
+| 1024x768 px | 4841528268 | 1,049 | 1,128 | −8% |
+| 1200x800 px | 705ef6a849 | 1,280 | 1,537 | −21% |
+| 1568x1045 px | 0a4c381ab1 | 2,185 | 1,536 | 29% |
+| 3000x2000 px | 5a127e5de6 | 2,185 | 1,537 | 29% |
+| 4000x3000 px | 0125fbdad5 | 2,459 | 1,653 | 32% |
+
+## Evidence
+
+| Field | Value |
+|---|---|
+| Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
+| Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
+| Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
+| Code revision | 45797db |
+| Quality check | not run: task success was not tested; 0 of 0 tasks checked |
+| Failures and excluded cases | none excluded; all 7 cases are listed, losses included |
+| Price | not applicable: no money figure is claimed (unpriced) |
+| Scope | only these inputs and this counter; it does not extend to other models, providers, tasks or dates |
 
 ## Why this measurement can be trusted
 

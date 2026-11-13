@@ -15,17 +15,30 @@ Synthetic Python projects of 6, 40 and 200 files; for the symbol lookup, the bas
 
 ## Cases
 
-| Case | Without the skill (tokens) | With the skill (tokens) | Saving |
-|---|---:|---:|---:|
-| 6 files: inventory | 1,096 | 525 | 52% |
-| 6 files: uses of one symbol | 294 | 557 | −90% |
-| 6 files: repeated blocks | 1,096 | 464 | 57% |
-| 40 files: inventory | 7,109 | 530 | 92% |
-| 40 files: uses of one symbol | 294 | 558 | −90% |
-| 40 files: repeated blocks | 7,109 | 506 | 92% |
-| 200 files: inventory | 36,249 | 532 | 98% |
-| 200 files: uses of one symbol | 294 | 559 | −91% |
-| 200 files: repeated blocks | 36,249 | 722 | 98% |
+| Case | Input fingerprint | Without the skill (tokens) | With the skill (tokens) | Saving |
+|---|---|---:|---:|---:|
+| 6 files: inventory | b258c1200f | 1,096 | 525 | 52% |
+| 6 files: uses of one symbol | b258c1200f | 294 | 557 | −90% |
+| 6 files: repeated blocks | b258c1200f | 1,096 | 464 | 57% |
+| 40 files: inventory | 10eac731f1 | 7,109 | 530 | 92% |
+| 40 files: uses of one symbol | 10eac731f1 | 294 | 558 | −90% |
+| 40 files: repeated blocks | 10eac731f1 | 7,109 | 506 | 92% |
+| 200 files: inventory | 7275521eb8 | 36,249 | 532 | 98% |
+| 200 files: uses of one symbol | 7275521eb8 | 294 | 559 | −91% |
+| 200 files: repeated blocks | 7275521eb8 | 36,249 | 722 | 98% |
+
+## Evidence
+
+| Field | Value |
+|---|---|
+| Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
+| Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
+| Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
+| Code revision | 45797db |
+| Quality check | not run: task success was not tested; 0 of 0 tasks checked |
+| Failures and excluded cases | none excluded; all 9 cases are listed, losses included |
+| Price | not applicable: no money figure is claimed (unpriced) |
+| Scope | only these inputs and this counter; it does not extend to other models, providers, tasks or dates |
 
 ## Why this measurement can be trusted
 
