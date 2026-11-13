@@ -222,6 +222,9 @@ def main(argv):
             print(f"skill removed: {result['skill_removed']}; hooks removed: {result['hooks_removed']}")
             return 0
         problems = check(args.home)
+        manifest_file = skill_dir(args.home) / MANIFEST
+        installed = json.loads(manifest_file.read_text(encoding="utf-8")).get("version", "unknown") if manifest_file.is_file() else "none"
+        print(f"installed version: {installed}; repository version: {source_version()}")
         print("\n".join(f"problem: {p}" for p in problems) if problems else "installed copy and hooks are in order")
         return 1 if problems else 0
     except InstallError as error:
