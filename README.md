@@ -2,7 +2,7 @@
 
 ## Expected savings
 
-<p align="center"><img src="docs/img/savings.svg" alt="Expected saving versus no skill, by aspect" width="760"><br><sub>Expected targets for the saving versus using no skill at all, net of the skill's own cost; these are not results. Real data today (estimates from runs on sample inputs, no agent runs; negative means the skill costs more than it saves): Documents (HTML only) 54% to 68%; Images −39% to 23%; Plain text, JSON, CSV −64% to 62%; Command output −98% to 99%; Code exploration −172% to 97%; Change review 3% to 87%; Documentation lookup 48% to 87%; Lockfiles and generated 74% to 99%; Fixed context −45% to 40%.</sub></p>
+<p align="center"><img src="docs/img/savings.svg" alt="Expected saving versus no skill, by aspect" width="760"><br><sub>Expected targets for the saving versus using no skill at all, net of the skill's own cost; these are not results. Real data today (estimates from runs on sample inputs, no agent runs; negative means the skill costs more than it saves): Documents (HTML only) 57% to 70%; Images −21% to 32%; Plain text, JSON, CSV −64% to 74%; Command output −35% to 99%; Code exploration −91% to 98%; Change review 31% to 88%; Documentation lookup 61% to 90%; Lockfiles and generated 81% to 99%; Fixed context −30% to 42%.</sub></p>
 
 ## Measurements
 

@@ -1,6 +1,6 @@
 # Plain text, JSON, CSV: saving versus no skill
 
-**Result: −64% to 62%** (minimum to maximum over 8 cases, net of the skill's own cost).
+**Result: −64% to 74%** (minimum to maximum over 8 cases, net of the skill's own cost).
 
 **Target (expected, not a result):** 0% to 77%. Basis: earlier small samples: JSON compaction 51%, tables 77%.
 
@@ -21,15 +21,15 @@ Plain text from 0.5 KB to 500 KB; JSON with 30 and 300 uniform rows and a nested
 | plain text, 5,000 bytes | 1,250 | 1,329 | −7% |
 | plain text, 50,000 bytes | 12,500 | 12,579 | −1% |
 | plain text, 500,000 bytes | 125,000 | 125,079 | −1% |
-| JSON, 30 uniform rows | 740 | 1,013 | −37% |
-| JSON, 300 uniform rows | 7,606 | 4,166 | 45% |
-| JSON, nested configuration | 3,308 | 2,462 | 25% |
-| CSV, 500 rows | 1,981 | 742 | 62% |
+| JSON, 30 uniform rows | 740 | 775 | −5% |
+| JSON, 300 uniform rows | 7,606 | 3,928 | 48% |
+| JSON, nested configuration | 3,308 | 2,224 | 32% |
+| CSV, 500 rows | 1,981 | 504 | 74% |
 
 ## Why this measurement can be trusted
 
 - **Both sides come from real files and real tool output.** The "without the skill" figure is the size of the input Claude would read; the "with the skill" figure is the size of what the tool printed for that same input. Nothing is modeled except the token estimate itself.
-- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (576 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
+- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (338 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
 - **The "no skill" side uses no resource of the skill at all.** It is a plain read, with no conversion, no summary and no index.
 - **Every case is listed, including the ones where the skill loses.** The range is the minimum and the maximum of all the cases, rounded down.
 - **The inputs are fixed and described**, so the numbers do not depend on a model's sampling and can be recomputed.
