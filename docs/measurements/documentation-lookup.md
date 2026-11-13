@@ -15,14 +15,27 @@ Documentation sets of 5, 30 and 120 documents with one planted answer; continuit
 
 ## Cases
 
-| Case | Without the skill (tokens) | With the skill (tokens) | Saving |
-|---|---:|---:|---:|
-| 5 documents: find one answer | 1,784 | 679 | 61% |
-| 30 documents: find one answer | 1,787 | 680 | 61% |
-| 120 documents: find one answer | 1,787 | 680 | 61% |
-| resume from a 150-token note | 6,328 | 575 | 90% |
-| resume from a 400-token note | 6,328 | 825 | 86% |
-| resume from a 800-token note | 6,328 | 1,225 | 80% |
+| Case | Input fingerprint | Without the skill (tokens) | With the skill (tokens) | Saving |
+|---|---|---:|---:|---:|
+| 5 documents: find one answer | 469d2f804a | 1,784 | 679 | 61% |
+| 30 documents: find one answer | 7b89ec2522 | 1,787 | 680 | 61% |
+| 120 documents: find one answer | 785276b243 | 1,787 | 680 | 61% |
+| resume from a 150-token note | 39a6bb9d6c | 6,328 | 575 | 90% |
+| resume from a 400-token note | 0432a563fa | 6,328 | 825 | 86% |
+| resume from a 800-token note | 547d5aef56 | 6,328 | 1,225 | 80% |
+
+## Evidence
+
+| Field | Value |
+|---|---|
+| Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
+| Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
+| Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
+| Code revision | 45797db |
+| Quality check | not run: task success was not tested; 0 of 0 tasks checked |
+| Failures and excluded cases | none excluded; all 6 cases are listed, losses included |
+| Price | not applicable: no money figure is claimed (unpriced) |
+| Scope | only these inputs and this counter; it does not extend to other models, providers, tasks or dates |
 
 ## Why this measurement can be trusted
 

@@ -15,11 +15,24 @@ Changes touching 3, 20 and 60 files of a synthetic project, every file modified.
 
 ## Cases
 
-| Case | Without the skill (tokens) | With the skill (tokens) | Saving |
-|---|---:|---:|---:|
-| 3 files changed | 832 | 568 | 31% |
-| 20 files changed | 5,614 | 1,030 | 81% |
-| 60 files changed | 17,001 | 1,932 | 88% |
+| Case | Input fingerprint | Without the skill (tokens) | With the skill (tokens) | Saving |
+|---|---|---:|---:|---:|
+| 3 files changed | fa60cf2630 | 832 | 568 | 31% |
+| 20 files changed | 44cd018e30 | 5,614 | 1,030 | 81% |
+| 60 files changed | f7ad7c4a2f | 17,001 | 1,932 | 88% |
+
+## Evidence
+
+| Field | Value |
+|---|---|
+| Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
+| Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
+| Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
+| Code revision | 45797db |
+| Quality check | not run: task success was not tested; 0 of 0 tasks checked |
+| Failures and excluded cases | none excluded; all 3 cases are listed, losses included |
+| Price | not applicable: no money figure is claimed (unpriced) |
+| Scope | only these inputs and this counter; it does not extend to other models, providers, tasks or dates |
 
 ## Why this measurement can be trusted
 

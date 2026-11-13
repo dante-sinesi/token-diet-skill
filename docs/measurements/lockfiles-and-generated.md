@@ -15,11 +15,24 @@ Synthetic package-lock.json files with 50, 400 and 3,000 packages.
 
 ## Cases
 
-| Case | Without the skill (tokens) | With the skill (tokens) | Saving |
-|---|---:|---:|---:|
-| package-lock.json, 50 packages | 3,426 | 639 | 81% |
-| package-lock.json, 400 packages | 27,376 | 639 | 97% |
-| package-lock.json, 3,000 packages | 206,476 | 639 | 99% |
+| Case | Input fingerprint | Without the skill (tokens) | With the skill (tokens) | Saving |
+|---|---|---:|---:|---:|
+| package-lock.json, 50 packages | a215a697dc | 3,426 | 639 | 81% |
+| package-lock.json, 400 packages | 211e39ceef | 27,376 | 639 | 97% |
+| package-lock.json, 3,000 packages | c92b5392e2 | 206,476 | 639 | 99% |
+
+## Evidence
+
+| Field | Value |
+|---|---|
+| Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
+| Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
+| Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
+| Code revision | 45797db |
+| Quality check | not run: task success was not tested; 0 of 0 tasks checked |
+| Failures and excluded cases | none excluded; all 3 cases are listed, losses included |
+| Price | not applicable: no money figure is claimed (unpriced) |
+| Scope | only these inputs and this counter; it does not extend to other models, providers, tasks or dates |
 
 ## Why this measurement can be trusted
 
