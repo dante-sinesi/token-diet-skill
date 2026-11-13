@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- **Fixed:** the read hook no longer deviates a content search without a limit. In real runs the agent repeated the same search right after the notice, so the notice only added a turn (+15% to +17% in dollars on small tasks). The hook now watches only the `Read` tool; installing again drops the `Grep` matcher.
+
 ## 1.0.0
 
 First stable release. The commands and options listed in the README are stable: they do not change inside a major version, and new options may be added.
