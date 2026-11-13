@@ -1,23 +1,26 @@
 <p align="center"><img src="docs/img/cover.svg" alt="Token Diet" width="760"><br><sub>Token Diet cover: a Claude Code skill that saves tokens without lowering performance.</sub></p>
 
+## Measured savings
+
+<p align="center"><img src="docs/img/agent-savings.svg" alt="Measured saving versus no skill, by aspect" width="760"><br><sub>Median cost in dollars of the same task with and without the skill, from real agent runs (3 to 4 repetitions per task, answers checked, 100% success in both arms); negative means the skill costs more. Almost all the saving comes from the read hook: the agent did not call the skill itself. Aspects not shown were tried and removed, or have no agent measurement yet.</sub></p>
+
 ## Expected savings
 
-<p align="center"><img src="docs/img/savings.svg" alt="Expected saving versus no skill, by aspect" width="760"><br><sub>Expected targets for the saving versus using no skill at all, net of the skill's own cost; these are not results. Real data today (estimates from runs on sample inputs, no agent runs; negative means the skill costs more than it saves): Documents (HTML only) 56% to 69%; Images −27% to 29%; Plain text, JSON, CSV −64% to 70%; Command output −56% to 99%; Code exploration −119% to 98%; Change review 21% to 88%; Documentation lookup 57% to 89%; Lockfiles and generated 78% to 99%; Fixed context −37% to 41%.</sub></p>
+<p align="center"><img src="docs/img/savings.svg" alt="Expected saving versus no skill, by aspect" width="760"><br><sub>Expected targets for the saving versus using no skill at all, net of the skill's own cost; these are not results. Real data today (estimates from runs on sample inputs, no agent runs; negative means the skill costs more than it saves): Code exploration −119% to 98%; Change review 21% to 88%; Documentation lookup 57% to 89%; Lockfiles and generated 78% to 99%; Fixed context −37% to 41%.</sub></p>
 
 ## Measurements
 
 Each report gives the method, every case measured and the limits:
 
 - [Documents](docs/measurements/documents.md)
-- [Images](docs/measurements/images.md)
-- [Plain text, JSON, CSV](docs/measurements/plain-text-json-csv.md)
 - [Command output](docs/measurements/command-output.md)
 - [Code exploration](docs/measurements/code-exploration.md)
 - [Change review](docs/measurements/change-review.md)
 - [Documentation lookup](docs/measurements/documentation-lookup.md)
 - [Lockfiles and generated files](docs/measurements/lockfiles-and-generated.md)
 - [Fixed context](docs/measurements/fixed-context.md)
-- [Real agent runs on simple tasks](docs/measurements/agent-runs.md)
+- [Real agent runs](docs/measurements/agent-runs.md)
+- [Tried, measured and removed](docs/measurements/removed.md): what did not pay for itself, with the measurement behind each decision
 
 ## Main goal
 
@@ -33,7 +36,7 @@ Every script lives in `token-diet/scripts/` and answers `--version`. The options
 
 | Command | What it does | Stable options |
 |---|---|---|
-| `convertir_fuentes.py FILE...` | Documents to Markdown, images to 1024 px; read the output in `.token-diet/sources/`, never the originals | `--out`, `--max-px`, `--json` |
+| `convertir_fuentes.py FILE...` | Documents to Markdown (images to 1024 px on request); read the output in `.token-diet/sources/`, never the originals | `--out`, `--max-px`, `--json` |
 | `capturar.py URL_OR_FILE` | Headless screenshot of a page or file, reduced to 1024 px | `--out`, `--max-px`, `--width`, `--height`, `--json` |
 | `consumo.py` | Audits what loads every session and says what to trim first; `--repo` adds a repository's skills, `--only-repo` measures them instead of the installed ones | `--root`, `--home`, `--repo`, `--only-repo`, `--json`, `--out` |
 | `compactar.py FILE` | Compacts JSON, CSV, logs, lockfiles and generated files and says what it may have lost | `--mode`, `--sample`, `--context`, `--out`, `--stdout`, `--lines A-B` |
@@ -57,6 +60,6 @@ To make the conversion mandatory and the continuity note automatic, install the 
 python instalar.py install
 ```
 
-It copies the skill to `~/.claude/skills/token-diet/` and registers two hooks in `~/.claude/settings.json` (a backup is kept and the rest of the file is untouched; `--dry-run` shows every change without making it): one blocks a `Read` of a PDF, Office document, image larger than 1024 px, or big lockfile or generated file and gives the exact command, and deviates once per session the first whole read of a text file longer than the line cap of the profile (400 lines by default) toward a ranged read, and likewise a second read of the same unchanged range; the other loads the continuity note at the start of a session. `python instalar.py check` says whether the installed copy still matches this repository and `python instalar.py uninstall` removes both.
+It copies the skill to `~/.claude/skills/token-diet/` and registers two hooks in `~/.claude/settings.json` (a backup is kept and the rest of the file is untouched; `--dry-run` shows every change without making it): one blocks a `Read` of a PDF, Office document, or big lockfile or generated file and gives the exact command, and deviates once per session the first whole read of a text file longer than the line cap of the profile (400 lines by default) toward a ranged read; the other loads the continuity note at the start of a session. `python instalar.py check` says whether the installed copy still matches this repository and `python instalar.py uninstall` removes both.
 
 Emergency exits: `python token-diet/scripts/modo.py allow PATTERN` for one file, or `TOKEN_DIET_LECTURA_DIRECTA=1` for everything. A broken hook allows the read and logs the error in `.token-diet/hook-errors.log` (`TOKEN_DIET_HOOK_DEPURAR=1` shows it).

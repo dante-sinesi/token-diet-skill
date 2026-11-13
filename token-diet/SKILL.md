@@ -1,6 +1,6 @@
 ---
 name: token-diet
-description: Saves tokens without lowering performance. Use when reading documents, PDFs, Word files, images, JSON, logs, lockfiles or large files; when running commands with long output; when measuring or trimming what is loaded every session (CLAUDE.md, skills, memory); and when sessions fill up fast or context keeps growing.
+description: Saves tokens without lowering performance. Use when reading documents, PDFs, Word files, logs, lockfiles or large files; when running commands with long output; when measuring or trimming what is loaded every session (CLAUDE.md, skills, memory); and when sessions fill up fast or context keeps growing.
 ---
 
 # Token Diet
@@ -10,8 +10,8 @@ Save tokens only where no decision changes (format, markup, repetition, noise, g
 Before reading or asking: is it needed? already in the conversation? is there a summary or a script?
 
 Run `python scripts/NAME.py` (options and costs: `references/commands.md`):
-- Document, PDF, Word, image: `convertir_fuentes.py FILE`; read its output in `.token-diet/sources/`, never the original. Page or screen: `capturar.py URL_OR_FILE`.
-- JSON, CSV, log, lockfile, minified file: `compactar.py FILE`. Test, lint or build output: `resumir.py -- COMMAND`.
+- Document, PDF, Word: `convertir_fuentes.py FILE`; read its output in `.token-diet/sources/`, never the original. Page or screen: `capturar.py URL_OR_FILE`.
+- Log, lockfile, minified file: `compactar.py FILE`. Test, lint or build output: `resumir.py -- COMMAND`.
 - Before reading many files: `estimar.py PATH`. Unfamiliar project: `relevar.py`. A symbol: `impacto.py SYMBOL`. A change: `contexto.py`. Repeated code: `duplicados.py`. Comment noise: `comentarios.py`.
 - Answers from documents: `indexar_docs.py query TERMS`. Continuity: `note show` at the start of a session, `note write` at the end. Documents too long or repeated: `texto.py check`; after moving text: `texto.py compare OLD NEW`.
 - What loads every session: `consumo.py`.

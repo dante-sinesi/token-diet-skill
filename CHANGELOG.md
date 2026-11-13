@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.2
+
+- **Removed:** the block on heavy images and the notice on a repeated read of the same range. In real runs the native image read is already reduced, so the block cost one extra turn (+8% in dollars); the repeated-read notice never fired and saved nothing. The skill no longer recommends compacting JSON or CSV or converting images: see [what was tried and removed](docs/measurements/removed.md).
+- **Kept:** the block on PDF and Office documents (−74% in dollars on a 12-page PDF) and the one-time deviation of a long file read whole (−34% in dollars on a 1,100-line source file). Installing again replaces the registered hook.
+
 ## 1.0.1
 
 - **Fixed:** the read hook no longer deviates a content search without a limit. In real runs the agent repeated the same search right after the notice, so the notice only added a turn (+15% to +17% in dollars on small tasks). The hook now watches only the `Read` tool; installing again drops the `Grep` matcher.

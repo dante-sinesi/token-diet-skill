@@ -1,8 +1,9 @@
 """PreToolUse hook: forces converting before reading heavy external files.
 
-Blocks a Read of a PDF, Office document, an image larger than 1024 px, or a big
-lockfile or generated file (minified, source map) and gives the exact command that
-produces something cheap to read. Small images, text and already converted files pass.
+Blocks a Read of a PDF, Office document, or a big lockfile or generated file
+(minified, source map) and gives the exact command that produces something cheap to
+read. Images, text and already converted files pass; the first whole read of a long text
+file is deviated once toward a ranged read.
 
 Register it in .claude/settings.json (or ~/.claude/settings.json):
   {"hooks": {"PreToolUse": [{"matcher": "Read", "hooks": [
@@ -27,8 +28,6 @@ IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp", ".tif", ".tiff"}
 LOCKFILES = {"package-lock.json", "yarn.lock", "pnpm-lock.yaml", "composer.lock", "poetry.lock", "Cargo.lock", "Gemfile.lock"}
 GENERATED_SUFFIXES = (".min.js", ".min.css", ".map")
 GENERATED_MIN_BYTES = 20_000
-MAX_IMAGE_PX = 1024
-FALLBACK_IMAGE_BYTES = 200_000
 
 
 def _is_generated(path):
@@ -45,18 +44,6 @@ def _convert_command(path):
 
 def _install_note(module, install):
     return "" if _has(module) else f' First install the missing library: {install}'
-
-
-def _image_is_heavy(path, max_px=MAX_IMAGE_PX):
-    if _has("PIL"):
-        from PIL import Image
-
-        try:
-            with Image.open(path) as image:
-                return max(image.size) > max_px
-        except Exception:  # noqa: BLE001 - unreadable header: treat as heavy, the converter reports it
-            return True
-    return path.stat().st_size > FALLBACK_IMAGE_BYTES
 
 
 def _lines_above(path, cap):
@@ -99,21 +86,6 @@ def _read_cap_message(payload, root, path, tool_input):
     return modo.build_message(reason, alternative, 1, "repeat the same Read and it goes through")
 
 
-def _reread_message(payload, root, path, tool_input):
-    """Soft block, once: the same unchanged range of a file read again in the same session."""
-    try:
-        stat = path.stat()
-    except OSError:
-        return None
-    session = str(payload.get("session_id") or "none")
-    key = f"seen:{session}:{path}:{stat.st_mtime_ns}:{stat.st_size}:{tool_input.get('offset') or 0}:{tool_input.get('limit') or 0}"
-    if modo.register_block(root, key) != 2:
-        return None
-    reason = f"{path.name} was already read in this session and has not changed: its text is in the conversation."
-    alternative = "use what you read; if you need another part, read that range (offset and limit) or search the file"
-    return modo.build_message(reason, alternative, 1, "repeat the same Read and it goes through")
-
-
 def decide(payload, root):
     """Returns the blocking message, or None to let the read through."""
     if payload.get("tool_name") != "Read":
@@ -129,34 +101,24 @@ def decide(payload, root):
     generated = _is_generated(path)
     if modo.direct_read_allowed(root, path):
         return None
-    if suffix not in DOC_EXTS and suffix not in IMAGE_EXTS and not generated:
-        tool_input = payload.get("tool_input") or {}
-        message = _read_cap_message(payload, root, path, tool_input)
-        state = modo.state_dir(root)
-        if message or not path.is_file() or state == path or state in path.parents:
-            return message
-        return _reread_message(payload, root, path, tool_input)
+    if suffix in IMAGE_EXTS:
+        return None
+    if suffix not in DOC_EXTS and not generated:
+        return _read_cap_message(payload, root, path, payload.get("tool_input") or {})
     sources = modo.sources_dir(root)
     if sources == path or sources in path.parents:
         return None
-    max_px = modo.profile_value(root, "image_px")
     if generated and (not path.is_file() or path.stat().st_size <= modo.profile_value(root, "generated_min_bytes")):
-        return None
-    if not generated and suffix in IMAGE_EXTS and (not path.is_file() or not _image_is_heavy(path, max_px)):
         return None
     count = modo.register_block(root, str(path))
     escape = f'python "{HERE / "modo.py"}" allow "{path}"'
     if generated:
         reason = f"{path.name} is a lockfile or generated file: reading it directly costs thousands of tokens for little information."
         alternative = f'python "{HERE / "compactar.py"}" "{path}", then read the summary it prints (grep the original for one package).'
-    elif suffix in DOC_EXTS:
+    else:
         reason = f"{path.name} is a binary document: reading it directly costs many tokens."
         note = _install_note("markitdown", 'pip install "markitdown[all]"')
         alternative = f"{_convert_command(path)}, then read the .md it prints.{note}"
-    else:
-        reason = f"{path.name} is larger than {max_px} px: it costs more tokens than needed."
-        note = _install_note("PIL", "pip install Pillow")
-        alternative = f"{_convert_command(path)}, then read the reduced image it prints (add --max-px N for more detail).{note}"
     return modo.build_message(reason, alternative, count, escape)
 
 
