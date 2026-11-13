@@ -136,6 +136,19 @@ A project instruction file with the same 12 facts in three versions: trimmed (ab
 - **Saving of trimming, with the skill's own cost charged** (its 76-token description paid on every turn at the rate this run implies, 0.0016 dollars per session): 44% from 10,000 tokens and 76% from 40,000 tokens, rounded down.
 - **What this does and does not show.** It shows what the fixed context costs and what trimming it is worth. The trimming here was done by hand to the result the audit command points to (repetition and history removed, every fact kept); the agent did not trim anything, and a real file has facts that are harder to separate from the noise.
 
+## 7. Can the agent trim the file by itself? (release 1.0.2)
+
+The 10,000-token instruction file of section 6 in a project, with the request to reduce it as much as possible without losing a fact a future session would need; 3 repetitions in each of the arms *without* and *with* the skill.
+
+| Arm | Dollars (median) | Turns | Size after | Facts kept | Skill commands called |
+|---|---:|---:|---:|---:|---:|
+| without | 0.087 | 2 | about 84 tokens | 12 of 12 | 0 |
+| with | 0.087 | 2 | about 84 tokens | 12 of 12 | 0 |
+
+- **The agent does it alone, in two turns, with or without the skill.** The instruction file is already in its context, so it rewrote it directly: about 84 tokens left, all 12 facts kept, 0.087 dollars. The skill was not called. Against the 0.213 dollars a 5-question session saves, the trimming pays for itself in the first session.
+- **So the saving of section 6 is not the skill's work.** What the skill could add is noticing that the file is heavy before anyone asks (the audit command); that was not measured here.
+- **Limit:** the bloat is pure repetition, which is the easiest case to trim without loss. A real file mixes obsolete and current rules, where losses are likelier.
+
 ## What it shows
 
 1. **The skill does not help on small tasks and does not cost either.** Its description is below the noise in every task.

@@ -2,7 +2,7 @@
 
 ## Measured savings
 
-<p align="center"><img src="docs/img/agent-savings.svg" alt="Measured saving versus no skill, by aspect" width="760"><br><sub>Median cost in dollars of the same task with and without the skill, from real agent runs (3 to 4 repetitions per task, answers checked, 100% success in every arm); negative means the skill costs more. For documents and long files the saving comes from the read hook (the agent did not call the skill itself); for fixed context it is the value of trimming an instruction file of 10,000 to 40,000 tokens by hand to what the audit points to. Aspects not shown were tried and removed, or have no agent measurement yet.</sub></p>
+<p align="center"><img src="docs/img/agent-savings.svg" alt="Measured saving versus no skill, by aspect" width="760"><br><sub>Median cost in dollars of the same task with and without the skill, from real agent runs (3 to 4 repetitions per task, answers checked, 100% success in every arm); negative means the skill costs more. For documents and long files the saving comes from the read hook (the agent did not call the skill itself); for fixed context it is the value of trimming an instruction file of 10,000 to 40,000 tokens, which an agent asked to do it does alone, with or without the skill. Aspects not shown were tried and removed, or have no agent measurement yet.</sub></p>
 
 ## Expected savings
 
