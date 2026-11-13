@@ -74,7 +74,7 @@ def file_hashes(base):
 
 def hook_commands(home, note_hook=True):
     scripts = (skill_dir(home) / "scripts").as_posix()
-    commands = {"PreToolUse": ('Read', f'python "{scripts}/hook_lectura_externa.py"')}
+    commands = {"PreToolUse": ('Read|Grep', f'python "{scripts}/hook_lectura_externa.py"')}
     if note_hook:
         commands["SessionStart"] = (None, f'python "{scripts}/indexar_docs.py" note show --quiet')
     return commands
