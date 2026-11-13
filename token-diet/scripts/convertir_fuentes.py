@@ -183,9 +183,9 @@ def convert(src, out_dir, max_px=DEFAULT_MAX_PX):
         raise
     except Exception as error:  # noqa: BLE001 - report any converter failure per file
         return Result(str(src), "error", message=f"{type(error).__name__}: {error}")
-    if not is_image and before is not None and after >= before:
+    if not is_image and before is not None and not guard.worth(before, after):
         pathlib.Path(output).unlink(missing_ok=True)
-        return Result(str(src), "passthrough", message="the Markdown is not smaller than the original: read the original")
+        return Result(str(src), "passthrough", message="the Markdown is not meaningfully smaller than the original: read the original")
     cache[str(src.resolve())] = {
         "key": key, "output": str(output), "before": before, "after": after, "warnings": warnings,
     }
