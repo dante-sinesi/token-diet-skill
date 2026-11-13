@@ -16,6 +16,7 @@ import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import version  # noqa: E402
 import walk  # noqa: E402
 
 DEF_KEYWORDS = r"(?:def|class|function|func|fn|interface|struct|enum|trait|type|sub|module|const|let|var)"
@@ -92,6 +93,7 @@ def render(report):
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Find the definition and uses of a symbol.")
+    parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("symbol")
     parser.add_argument("--root", default=".")
     parser.add_argument("--max-files", type=int, default=15)

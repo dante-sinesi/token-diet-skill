@@ -13,6 +13,7 @@ import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import version  # noqa: E402
 import walk  # noqa: E402
 
 TRIVIAL = re.compile(r"^[\W_]*$")
@@ -88,6 +89,7 @@ def render(blocks, limit):
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Detect repeated blocks of code.")
+    parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("paths", nargs="*", default=["."])
     parser.add_argument("--min-lines", type=int, default=6)
     parser.add_argument("--max", type=int, default=15)

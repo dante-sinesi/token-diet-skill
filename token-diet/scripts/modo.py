@@ -22,6 +22,8 @@ import pathlib
 import sys
 import traceback
 
+import version
+
 ENV_DIRECT = "TOKEN_DIET_LECTURA_DIRECTA"
 ENV_DEBUG = "TOKEN_DIET_HOOK_DEPURAR"
 REPEAT_AT = 3
@@ -113,6 +115,9 @@ def log_error(root, hook):
 
 
 def main(argv):
+    if argv[:1] == ["--version"]:
+        print(version.label())
+        return 0
     root = project_root()
     if argv[:1] == ["allow"] and len(argv) == 2:
         allow(root, argv[1])

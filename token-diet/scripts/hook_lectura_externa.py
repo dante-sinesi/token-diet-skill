@@ -19,6 +19,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import modo  # noqa: E402
+import version  # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
 DOC_EXTS = {".pdf", ".docx", ".doc", ".xlsx", ".xls", ".pptx", ".ppt", ".odt", ".ods", ".odp", ".epub"}
@@ -122,4 +123,7 @@ def run(stdin_text, stdout, stderr, root=None):
 
 
 if __name__ == "__main__":
+    if sys.argv[1:] == ["--version"]:
+        print(version.label())
+        sys.exit(0)
     sys.exit(run(sys.stdin.read(), sys.stdout, sys.stderr))

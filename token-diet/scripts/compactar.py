@@ -30,6 +30,8 @@ import pathlib
 import re
 import sys
 
+import version
+
 DEFAULT_SAMPLE = 5
 DEFAULT_CONTEXT = 2
 LARGE_CSV_ROWS = 200
@@ -274,6 +276,7 @@ def read_lines(path, spec):
 
 def main(argv):
     parser = argparse.ArgumentParser(description="Compact a file before reading it.")
+    parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("file")
     parser.add_argument("--mode", default="auto", choices=["auto", "json", "table", "schema", "log", "lock", "generated"])
     parser.add_argument("--sample", type=int, default=DEFAULT_SAMPLE)

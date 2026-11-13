@@ -28,17 +28,24 @@ The main goal is that, when the time comes, the `senior` skill sheds everything 
 
 ## Usage
 
-```bash
-python token-diet/scripts/convertir_fuentes.py report.pdf photo.png
-python token-diet/scripts/consumo.py --repo .
-python token-diet/scripts/compactar.py data.json server.log
-python token-diet/scripts/resumir.py -- pytest -q
-python token-diet/scripts/contexto.py
-python token-diet/scripts/indexar_docs.py build
-python token-diet/scripts/indexar_docs.py query hook blocks
-```
+Every script lives in `token-diet/scripts/` and answers `--version`. The options listed here are stable: they do not change inside a major version, and new ones may be added.
 
-`convertir_fuentes.py` writes Markdown and reduced images to `.token-diet/sources/`; read those, never the originals (`--max-px N` asks for a larger image). `consumo.py` audits what is loaded every session and says what to trim first; `--repo` adds the skills of a repository without installing them. `compactar.py` shrinks JSON (to a table when the rows are uniform), logs (WARN and ERROR with context, `--lines A-B` reads the original), lockfiles and generated files, and says what it may have lost. `resumir.py` runs a test, lint or build command and returns only the lines that matter; `contexto.py` gives the case file of a change (what it touches, who uses it, what to look at first); `estimar.py`, `relevar.py`, `impacto.py` and `duplicados.py` size, map and search a project without reading it. `indexar_docs.py` indexes documents and code symbols and answers a query with the section to open and what opening it costs; its `note` command keeps a continuity note with a token cap so a new session resumes without re-explaining the project.
+| Command | What it does | Stable options |
+|---|---|---|
+| `convertir_fuentes.py FILE...` | Documents to Markdown, images to 1024 px; read the output in `.token-diet/sources/`, never the originals | `--out`, `--max-px`, `--json` |
+| `consumo.py` | Audits what loads every session and says what to trim first | `--root`, `--home`, `--repo`, `--json`, `--out` |
+| `compactar.py FILE` | Compacts JSON, CSV, logs, lockfiles and generated files and says what it may have lost | `--mode`, `--sample`, `--context`, `--out`, `--stdout`, `--lines A-B` |
+| `resumir.py -- COMMAND` | Runs a test, lint or build command and returns only the lines that matter | `--max-lines`, `--timeout`, `--out` |
+| `estimar.py [PATH...]` | Estimates the token cost of reading paths before spending it | `--depth`, `--top`, `--budget`, `--json` |
+| `impacto.py SYMBOL` | Where a symbol is defined and used, and what similar already exists | `--root`, `--max-files`, `--json` |
+| `contexto.py` | Case file of a change: what it touches, who uses it, what to look at first | `--staged`, `--base`, `--head`, `--root`, `--json` |
+| `duplicados.py [PATH...]` | Repeated blocks of code | `--min-lines`, `--max`, `--ext`, `--json` |
+| `relevar.py [ROOT]` | Inventory of an unfamiliar project | `--top`, `--out`, `--json` |
+| `indexar_docs.py build \| query TERMS \| note show\|write` | Index of documents and code with the cost of opening each result; continuity note with a token cap | `--root`, `--limit`, `--text`, `--quiet` |
+| `modo.py allow PATTERN \| show` | Emergency exit for the read hook | none |
+| `instalar.py install \| check \| uninstall` (repository root) | Installs the skill and its hooks, checks for drift, removes both | `--home`, `--no-note-hook` |
+
+## Install
 
 To make the conversion mandatory and the continuity note automatic, install the skill and its hooks:
 
