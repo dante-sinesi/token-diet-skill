@@ -62,6 +62,7 @@ def load_config(root):
     data.setdefault("direct_read", [])
     data.setdefault("blocks", {})
     data.setdefault("always_loaded", [])
+    data.setdefault("document_limits", {})
     return data
 
 

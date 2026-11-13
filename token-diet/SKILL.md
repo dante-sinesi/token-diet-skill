@@ -15,7 +15,7 @@ Run `python scripts/NAME.py` (options in `references/commands.md`):
 - Test, lint or build output: `resumir.py -- COMMAND`.
 - Before reading many files: `estimar.py PATH`. Unfamiliar project: `relevar.py`. A symbol: `impacto.py SYMBOL`. A change: `contexto.py`. Repeated code: `duplicados.py`.
 - Answers from documents: `indexar_docs.py query TERMS`. Continuity: `note show` at the start of a session, `note write` at the end.
-- What loads every session: `consumo.py`.
+- What loads every session: `consumo.py`. Documents too long or repeated: `texto.py check`; after moving or trimming text: `texto.py compare OLD NEW`.
 - A read was blocked: follow the command in the message; `modo.py allow PATTERN` lets one file through.
 
 Every reduction has an exit (line range, original, full section) and says what it may have lost. A mechanic that lowers task success does not get in. The skill must not cost more than it saves. Guide to output and reads: `references/tokens.md`.
