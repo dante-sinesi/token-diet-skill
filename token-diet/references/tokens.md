@@ -23,3 +23,13 @@
 
 ## Prompt cache
 Do not modify `CLAUDE.md` or the skills in the middle of a long session: a change in what is loaded first forces the prefix to be reprocessed.
+
+## Context hygiene
+
+Everything in the conversation is paid again on every turn, and answers tend to degrade when the conversation passes about half of the context window (a rule of thumb, not a measured limit).
+
+- **Summarize** after a finished milestone, before changing topic, and when the same files keep being read again.
+- **Start a new session** for an unrelated task, when the conversation is above half of the window, or when the same error keeps coming back.
+- **How:** write the continuity note (`python scripts/indexar_docs.py note write`) with the goal, the state, the next step and the decisions, within its token cap; the new session reads it with `note show`.
+- **Do not edit** `CLAUDE.md` or the skills in the middle of a long session: it invalidates the cached prefix.
+
