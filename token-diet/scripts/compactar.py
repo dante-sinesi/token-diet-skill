@@ -31,6 +31,7 @@ import re
 import sys
 
 import guard
+import terminal
 import version
 
 DEFAULT_SAMPLE = 5
@@ -134,14 +135,17 @@ def _log_key(line):
 
 
 def filter_log(text, context):
-    lines = text.splitlines()
+    lines = [terminal.clean_line(line) for line in terminal.lines_of(text)]
     keep, levels = set(), {}
     for index, line in enumerate(lines):
         match = LEVEL.search(line)
-        if not match and not TRACE_START.match(line):
+        important = terminal.is_important(line)
+        if not match and not important and not TRACE_START.match(line):
             continue
         if match:
             levels[match.group(1)] = levels.get(match.group(1), 0) + 1
+        elif important:
+            levels["signal"] = levels.get("signal", 0) + 1
         lo, hi = max(0, index - context), min(len(lines) - 1, index + context)
         while hi + 1 < len(lines) and (lines[hi + 1][:1] in (" ", "	") or TRACE_START.match(lines[hi + 1])):
             hi += 1
@@ -242,6 +246,12 @@ def pick_mode(path, requested):
     return None
 
 
+def read_raw(path):
+    """File text with its line endings untouched (a lone carriage return is a progress redraw, not a line break)."""
+    with open(path, encoding="utf-8", errors="replace", newline="") as handle:
+        return handle.read()
+
+
 def compact(path, mode="auto", sample=DEFAULT_SAMPLE, context=DEFAULT_CONTEXT):
     path = pathlib.Path(path)
     if not path.is_file():
@@ -253,7 +263,7 @@ def compact(path, mode="auto", sample=DEFAULT_SAMPLE, context=DEFAULT_CONTEXT):
     chosen = pick_mode(path, mode)
     if chosen is None:
         raise CompactError("nothing to compact for this file type (use --mode to force one)")
-    text = path.read_text(encoding="utf-8", errors="replace")
+    text = read_raw(path)
     if chosen in ("json", "table"):
         return compact_json(text, "auto" if mode == "auto" else chosen)
     if chosen == "schema":
@@ -275,8 +285,8 @@ def read_lines(path, spec):
     if not match or int(match.group(1)) < 1 or int(match.group(2)) < int(match.group(1)):
         raise CompactError("--lines needs a range like 120-180")
     start, end = int(match.group(1)), int(match.group(2))
-    lines = pathlib.Path(path).read_text(encoding="utf-8", errors="replace").splitlines()
-    return "\n".join(f"{n}: {lines[n - 1]}" for n in range(start, min(end, len(lines)) + 1))
+    lines = terminal.lines_of(read_raw(path))
+    return "\n".join(f"{n}: {lines[n - 1].rstrip(chr(13))}" for n in range(start, min(end, len(lines)) + 1))
 
 
 def main(argv):
@@ -299,7 +309,7 @@ def main(argv):
         print(f"error: {error}", file=sys.stderr)
         return 1
     source = pathlib.Path(args.file)
-    original = source.read_text(encoding="utf-8", errors="replace")
+    original = read_raw(source)
     before = tokens(original)
     after = tokens(result.text)
     if not guard.never_worse(original, result.text):

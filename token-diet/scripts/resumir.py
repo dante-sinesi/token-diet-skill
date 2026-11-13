@@ -18,6 +18,7 @@ import sys
 import time
 
 import guard
+import terminal
 import version
 
 PROBLEM = re.compile(
@@ -37,7 +38,7 @@ def tokens(text):
 def pick(lines, max_lines):
     keep = set()
     for index, line in enumerate(lines):
-        if PROBLEM.search(line):
+        if PROBLEM.search(line) or terminal.is_important(line):
             keep.update(range(max(0, index - 1), min(len(lines), index + 2)))
             nxt = index + 1
             while nxt < len(lines) and lines[nxt][:1] in (" ", "\t"):
@@ -62,8 +63,9 @@ def pick(lines, max_lines):
 def run(command, timeout=600):
     start = time.time()
     try:
-        done = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout)
-        return done.returncode, (done.stdout or "") + (done.stderr or ""), time.time() - start
+        done = subprocess.run(command, capture_output=True, timeout=timeout)
+        text = (done.stdout or b"").decode("utf-8", errors="replace") + (done.stderr or b"").decode("utf-8", errors="replace")
+        return done.returncode, text.replace("\r\n", "\n"), time.time() - start
     except FileNotFoundError:
         return 127, f"command not found: {command[0]}", time.time() - start
     except subprocess.TimeoutExpired as error:
@@ -74,7 +76,7 @@ def run(command, timeout=600):
 
 
 def summarize(command, code, output, seconds, max_lines, out_dir):
-    lines = output.splitlines()
+    lines = [terminal.clean_line(line) for line in terminal.lines_of(output)]
     skipped = max(0, len(lines) - MAX_LINES)
     lines = lines[skipped:]
     digest = hashlib.sha256(output.encode("utf-8", errors="replace")).hexdigest()[:8]

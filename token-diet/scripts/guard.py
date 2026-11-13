@@ -6,16 +6,24 @@ import math
 import pathlib
 
 MAX_INPUT_BYTES = 64 * 1024 * 1024
-NOT_WORTH = "not worth compacting: the result is not smaller than the original, read the original"
+NOT_WORTH = "not worth compacting: the result is not meaningfully smaller than the original, read the original"
 
 
 def tokens(text):
     return math.ceil(len(text) / 4)
 
 
+MIN_GAIN = 0.05
+
+
+def worth(before, after, min_gain=MIN_GAIN):
+    """True only when `after` tokens are at least `min_gain` below `before` (a one-token gain is noise)."""
+    return after < before and after <= before * (1 - min_gain)
+
+
 def never_worse(original, result):
-    """True only when the result is strictly smaller than the original, in tokens."""
-    return tokens(result) < tokens(original)
+    """True only when the result is meaningfully smaller than the original, in tokens."""
+    return worth(tokens(original), tokens(result))
 
 
 def check_size(path, cap=None):
