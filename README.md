@@ -45,7 +45,7 @@ Every script lives in `token-diet/scripts/` and answers `--version`. The options
 | `duplicados.py [PATH...]` | Repeated blocks of code | `--min-lines`, `--max`, `--ext`, `--json` |
 | `relevar.py [ROOT]` | Inventory of an unfamiliar project | `--top`, `--out`, `--json` |
 | `indexar_docs.py build \| query TERMS \| note show\|write` | Index of documents and code with the cost of opening each result; continuity note with a token cap | `--root`, `--limit`, `--text`, `--quiet` |
-| `modo.py allow PATTERN \| show` | Emergency exit for the read hook | none |
+| `modo.py allow PATTERN \| show \| profile [light\|standard\|strict]` | Emergency exit for the read hook; diet profile that sets how strict the thresholds are (standard by default) | `profile` |
 | `instalar.py install \| check \| uninstall` (repository root) | Installs the skill and its hooks, checks for drift, removes both | `--home`, `--no-note-hook` |
 
 ## Install

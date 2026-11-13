@@ -21,9 +21,9 @@ def worth(before, after, min_gain=MIN_GAIN):
     return after < before and after <= before * (1 - min_gain)
 
 
-def never_worse(original, result):
+def never_worse(original, result, min_gain=MIN_GAIN):
     """True only when the result is meaningfully smaller than the original, in tokens."""
-    return worth(tokens(original), tokens(result))
+    return worth(tokens(original), tokens(result), min_gain)
 
 
 def check_size(path, cap=None):

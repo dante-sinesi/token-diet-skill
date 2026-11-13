@@ -25,6 +25,7 @@ import shutil
 import sys
 
 import guard
+import modo
 import version
 
 DEFAULT_MAX_PX = 1024
@@ -154,7 +155,7 @@ def convert_document(src, out_dir):
     return target, before, tokens_of_text(len(text)), warnings
 
 
-def convert(src, out_dir, max_px=DEFAULT_MAX_PX):
+def convert(src, out_dir, max_px=DEFAULT_MAX_PX, min_gain=guard.MIN_GAIN):
     src = pathlib.Path(src)
     out_dir = pathlib.Path(out_dir)
     if not src.is_file():
@@ -183,7 +184,7 @@ def convert(src, out_dir, max_px=DEFAULT_MAX_PX):
         raise
     except Exception as error:  # noqa: BLE001 - report any converter failure per file
         return Result(str(src), "error", message=f"{type(error).__name__}: {error}")
-    if not is_image and before is not None and not guard.worth(before, after):
+    if not is_image and before is not None and not guard.worth(before, after, min_gain):
         pathlib.Path(output).unlink(missing_ok=True)
         return Result(str(src), "passthrough", message="the Markdown is not meaningfully smaller than the original: read the original")
     cache[str(src.resolve())] = {
@@ -222,7 +223,8 @@ def main(argv):
     parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("paths", nargs="+")
     parser.add_argument("--out", default=os.environ.get("TOKEN_DIET_SOURCES_DIR", ".token-diet/sources"))
-    parser.add_argument("--max-px", type=int, default=DEFAULT_MAX_PX)
+    profile_px = modo.profile_value(modo.project_root(), "image_px")
+    parser.add_argument("--max-px", type=int, default=profile_px)
     parser.add_argument("--json", action="store_true", help="print one JSON object per file")
     args = parser.parse_args(argv)
     if args.max_px < 1:
@@ -231,7 +233,7 @@ def main(argv):
     failed = False
     for path in _expand(args.paths):
         try:
-            result = convert(path, out_dir, args.max_px)
+            result = convert(path, out_dir, args.max_px, modo.profile_value(modo.project_root(), "min_gain"))
         except MissingLibrary as error:
             print(f"error: {error}", file=sys.stderr)
             return 2

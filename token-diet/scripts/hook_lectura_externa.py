@@ -47,13 +47,13 @@ def _install_note(module, install):
     return "" if _has(module) else f' First install the missing library: {install}'
 
 
-def _image_is_heavy(path):
+def _image_is_heavy(path, max_px=MAX_IMAGE_PX):
     if _has("PIL"):
         from PIL import Image
 
         try:
             with Image.open(path) as image:
-                return max(image.size) > MAX_IMAGE_PX
+                return max(image.size) > max_px
         except Exception:  # noqa: BLE001 - unreadable header: treat as heavy, the converter reports it
             return True
     return path.stat().st_size > FALLBACK_IMAGE_BYTES
@@ -79,9 +79,10 @@ def decide(payload, root):
     sources = modo.sources_dir(root)
     if sources == path or sources in path.parents:
         return None
-    if generated and (not path.is_file() or path.stat().st_size <= GENERATED_MIN_BYTES):
+    max_px = modo.profile_value(root, "image_px")
+    if generated and (not path.is_file() or path.stat().st_size <= modo.profile_value(root, "generated_min_bytes")):
         return None
-    if not generated and suffix in IMAGE_EXTS and (not path.is_file() or not _image_is_heavy(path)):
+    if not generated and suffix in IMAGE_EXTS and (not path.is_file() or not _image_is_heavy(path, max_px)):
         return None
     count = modo.register_block(root, str(path))
     escape = f'python "{HERE / "modo.py"}" allow "{path}"'
@@ -93,7 +94,7 @@ def decide(payload, root):
         note = _install_note("markitdown", 'pip install "markitdown[all]"')
         alternative = f"{_convert_command(path)}, then read the .md it prints.{note}"
     else:
-        reason = f"{path.name} is larger than {MAX_IMAGE_PX} px: it costs more tokens than needed."
+        reason = f"{path.name} is larger than {max_px} px: it costs more tokens than needed."
         note = _install_note("PIL", "pip install Pillow")
         alternative = f"{_convert_command(path)}, then read the reduced image it prints (add --max-px N for more detail).{note}"
     return modo.build_message(reason, alternative, count, escape)

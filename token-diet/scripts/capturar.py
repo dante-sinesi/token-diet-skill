@@ -20,6 +20,7 @@ import subprocess
 import sys
 
 import convertir_fuentes as cf
+import modo
 import version
 
 DEFAULT_OUT = ".token-diet/capture"
@@ -86,7 +87,7 @@ def main(argv):
     parser.add_argument("--version", action="version", version=version.label())
     parser.add_argument("target")
     parser.add_argument("--out", default=DEFAULT_OUT)
-    parser.add_argument("--max-px", type=int, default=cf.DEFAULT_MAX_PX)
+    parser.add_argument("--max-px", type=int, default=modo.profile_value(modo.project_root(), "image_px"))
     parser.add_argument("--width", type=int, default=1280)
     parser.add_argument("--height", type=int, default=800)
     parser.add_argument("--json", action="store_true")

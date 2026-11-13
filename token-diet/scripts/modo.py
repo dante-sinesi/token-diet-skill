@@ -14,6 +14,7 @@ Environment:
 Command line:
   python modo.py allow PATTERN   let matching files be read directly
   python modo.py show            print the configuration
+  python modo.py profile [light|standard|strict]   show or choose the diet profile (thresholds of the other tools)
 """
 import fnmatch
 import json
@@ -27,6 +28,12 @@ import version
 ENV_DIRECT = "TOKEN_DIET_LECTURA_DIRECTA"
 ENV_DEBUG = "TOKEN_DIET_HOOK_DEPURAR"
 REPEAT_AT = 3
+PROFILES = {
+    "light": {"image_px": 1568, "generated_min_bytes": 50_000, "read_cap_lines": 1000, "min_gain": 0.10},
+    "standard": {"image_px": 1024, "generated_min_bytes": 20_000, "read_cap_lines": 400, "min_gain": 0.05},
+    "strict": {"image_px": 768, "generated_min_bytes": 10_000, "read_cap_lines": 200, "min_gain": 0.03},
+}
+DEFAULT_PROFILE = "standard"
 TRUE_VALUES = {"1", "true", "yes", "on"}
 
 
@@ -70,6 +77,24 @@ def save_config(root, config):
     path = _config_path(root)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(config, indent=1, sort_keys=True), encoding="utf-8")
+
+
+def profile_name(root):
+    name = load_config(root).get("profile", DEFAULT_PROFILE)
+    return name if name in PROFILES else DEFAULT_PROFILE
+
+
+def profile_value(root, key):
+    """Threshold `key` of the profile chosen for the project (standard when none was chosen)."""
+    return PROFILES[profile_name(root)][key]
+
+
+def set_profile(root, name):
+    if name not in PROFILES:
+        raise ValueError(f"unknown profile {name!r}: choose " + ", ".join(PROFILES))
+    config = load_config(root)
+    config["profile"] = name
+    save_config(root, config)
 
 
 def direct_read_allowed(root, path):
@@ -123,6 +148,16 @@ def main(argv):
     if argv[:1] == ["allow"] and len(argv) == 2:
         allow(root, argv[1])
         print(f"allowed: {argv[1]}")
+        return 0
+    if argv[:1] == ["profile"] and len(argv) <= 2:
+        if len(argv) == 2:
+            try:
+                set_profile(root, argv[1])
+            except ValueError as error:
+                print(f"error: {error}", file=sys.stderr)
+                return 1
+        name = profile_name(root)
+        print(f"profile: {name} " + json.dumps(PROFILES[name]))
         return 0
     if argv[:1] == ["show"]:
         print(json.dumps(load_config(root), indent=1, sort_keys=True))
