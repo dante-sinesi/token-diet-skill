@@ -19,3 +19,15 @@ Every script answers `--version`. Options listed here are stable inside a major 
 | `duplicados.py PATH...` | Repeated blocks of code | `--min-lines`, `--max`, `--ext`, `--json` |
 | `relevar.py ROOT` | Inventory of an unfamiliar project | `--top`, `--out`, `--json` |
 | `indexar_docs.py build \| query TERMS \| note show\|write` | Index of documents and code with the cost of opening each result; continuity note with a token cap | `--root`, `--limit`, `--text`, `--quiet` |
+
+## Cost
+
+What the skill itself adds, in tokens (characters divided by 4):
+
+| When | Cost |
+|---|---|
+| Every session | about 80 (the description) |
+| When the skill is used | about 400 once (the body of `SKILL.md`) |
+| Each call | about 20 for the command plus its output: one line for a conversion, a summary or a block message, up to a few dozen lines for a case file or an index query |
+
+Whether it pays: the measurement report of each aspect lists every case, losses included. For a small input the skill costs more than it saves; the tools say so and return the original (`not worth compacting`).
