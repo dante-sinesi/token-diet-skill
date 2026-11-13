@@ -1,15 +1,18 @@
 """Reports comment noise: comments that say what the code already says, commented-out code, decoration.
 
-Usage: python comentarios.py [PATH ...] [--ext py,js,...] [--max N] [--json]
+Usage: python comentarios.py [PATH ...] [--ext py,js,...] [--max N] [--json] [--changed [--base REF]]
 
 Only the why earns a comment. This tool reports and never edits. It skips shebangs, encodings,
 licenses, TODO/FIXME/NOTE/HACK, linter and type directives, and anything with "token-diet-ignore" on
-the comment or on the code line below it. Exit codes: 0 nothing found, 1 something found.
+the comment or on the code line below it. With --changed only the lines added or modified since --base
+(default HEAD, plus untracked files) are judged: code that is not being touched is left alone.
+Exit codes: 0 nothing found, 1 something found.
 """
 import argparse
 import json
 import pathlib
 import re
+import subprocess
 import sys
 
 import version
@@ -77,7 +80,35 @@ def analyze(path):
     return found
 
 
-def scan(paths, extensions=None):
+HUNK = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+
+
+def changed_lines(root, base="HEAD"):
+    """{relative path: set of added or modified line numbers} since `base`, untracked files entirely."""
+    root = pathlib.Path(root)
+
+    def git(*args):
+        done = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=60)
+        if done.returncode != 0:
+            raise RuntimeError(done.stderr.strip() or "git failed")
+        return done.stdout
+
+    changed, current = {}, None
+    for line in git("diff", "-U0", base).splitlines():
+        if line.startswith("+++ b/"):
+            current = line[6:]
+        elif line.startswith("@@") and current:
+            match = HUNK.match(line)
+            if match:
+                start, count = int(match.group(1)), int(match.group(2) or 1)
+                changed.setdefault(current, set()).update(range(start, start + count))
+    for rel in git("ls-files", "--others", "--exclude-standard").splitlines():
+        text = walk.read_text(root / rel)
+        changed[rel] = set(range(1, len(text.splitlines()) + 1))
+    return changed
+
+
+def scan(paths, extensions=None, changed=None):
     results = {}
     root = pathlib.Path(paths[0]) if paths else pathlib.Path(".")
     for base in paths:
@@ -86,9 +117,12 @@ def scan(paths, extensions=None):
             if extensions and path.suffix.lstrip(".").lower() not in extensions:
                 continue
             if path.suffix.lower() in PREFIX and walk.is_text(path):
+                rel = walk.relative(path, anchor)
                 items = analyze(path)
+                if changed is not None:
+                    items = [i for i in items if i["line"] in changed.get(rel, ())]
                 if items:
-                    results[walk.relative(path, anchor)] = items
+                    results[rel] = items
     return results
 
 
@@ -116,9 +150,18 @@ def main(argv):
     parser.add_argument("--ext")
     parser.add_argument("--max", type=int, default=40)
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--changed", action="store_true", help="judge only the lines added or modified since --base")
+    parser.add_argument("--base", default="HEAD")
     args = parser.parse_args(argv)
     extensions = {e.strip().lstrip(".").lower() for e in args.ext.split(",")} if args.ext else None
-    results = scan(args.paths, extensions)
+    changed = None
+    if args.changed:
+        try:
+            changed = changed_lines(args.paths[0] if len(args.paths) == 1 and pathlib.Path(args.paths[0]).is_dir() else ".", args.base)
+        except (RuntimeError, OSError) as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 2
+    results = scan(args.paths, extensions, changed)
     print(json.dumps(results, indent=1) if args.json else render(results, args.max))
     return 1 if results else 0
 

@@ -12,7 +12,7 @@ Every script answers `--version`. Options listed here are stable inside a major 
 | `compactar.py FILE` | JSON (a table when rows are uniform), CSV schema, logs (WARN and ERROR with context), lockfiles, generated files. Says what may have been lost | `--mode`, `--sample`, `--context`, `--out`, `--stdout`, `--lines A-B` |
 | `resumir.py -- COMMAND` | Runs the command; returns the exit code, duration and the lines that matter; the full output is saved | `--max-lines`, `--timeout`, `--out` |
 | `texto.py check \| compare OLD NEW` | Documents above their line cap (path patterns in `.token-diet/config.json`, `document_limits`), paragraphs repeated between documents, and what a moved or trimmed text lost (headings, inline code, URLs, paths, numbers); `token-diet-ignore` skips | `--root`, `--min-chars`, `--json` |
-| `comentarios.py PATH...` | Reports comments that say what the code says, commented-out code and decoration; skips directives, licenses, TODO and `token-diet-ignore`; never edits | `--ext`, `--max`, `--json` |
+| `comentarios.py PATH...` | Reports comments that say what the code says, commented-out code and decoration; skips directives, licenses, TODO and `token-diet-ignore`; `--changed` judges only the lines added or modified since `--base`; never edits | `--ext`, `--max`, `--json`, `--changed`, `--base` |
 | `estimar.py PATH...` | Token cost of reading paths, by folder; `--budget` exits 1 when over | `--depth`, `--top`, `--budget`, `--json` |
 | `impacto.py SYMBOL` | Definition, uses and similar existing names | `--root`, `--max-files`, `--json` |
 | `contexto.py` | Case file of a change: files, symbols, users, what to look at first, warnings | `--staged`, `--base`, `--head`, `--root`, `--json` |
