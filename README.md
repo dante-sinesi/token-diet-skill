@@ -2,11 +2,7 @@
 
 ## Measured savings
 
-<p align="center"><img src="docs/img/agent-savings.svg" alt="Measured saving versus no skill, by aspect" width="760"><br><sub>Median cost in dollars of the same task with and without the skill, from real agent runs (3 to 4 repetitions per task, answers checked, 100% success in every arm); negative means the skill costs more. For documents and long files the saving comes from the read hook (the agent did not call the skill itself); for fixed context it is the value of trimming an instruction file of 10,000 to 40,000 tokens, which an agent asked to do it does alone, with or without the skill. Aspects not shown were tried and removed, or have no agent measurement yet.</sub></p>
-
-## Expected savings
-
-<p align="center"><img src="docs/img/savings.svg" alt="Expected saving versus no skill, by aspect" width="760"><br><sub>Expected targets for the saving versus using no skill at all, net of the skill's own cost; these are not results. Real data today (estimates from runs on sample inputs, no agent runs; negative means the skill costs more than it saves): Code exploration −119% to 98%; Change review 21% to 88%; Documentation lookup 57% to 89%; Lockfiles and generated 78% to 99%.</sub></p>
+<p align="center"><img src="docs/img/agent-savings.svg" alt="Measured saving versus no skill, by aspect" width="760"><br><sub>Median cost in dollars of the same task with and without the skill, from real agent runs (3 to 4 repetitions per task, answers checked, 100% success in every arm); negative means the skill costs more. Documents are PDF, Word, Excel and HTML. For documents, long files and the continuity note the saving comes from the hooks (the agent did not call the skill itself); for fixed context it is the value of trimming an instruction file of 10,000 to 40,000 tokens, which an agent asked to do it does alone, with or without the skill. Aspects that cost more than they saved were removed (see the page on what was tried and removed).</sub></p>
 
 ## Measurements
 
