@@ -18,6 +18,7 @@ import sys
 import time
 
 import guard
+import modo
 import terminal
 import version
 
@@ -113,7 +114,7 @@ def main(argv):
         return 2
     code, output, seconds = run(command, args.timeout)
     report, target = summarize(command, code, output, seconds, args.max_lines, args.out)
-    if not guard.never_worse(output, report):
+    if not guard.never_worse(output, report, modo.profile_value(modo.project_root(), "min_gain")):
         target.unlink(missing_ok=True)
         print(output.rstrip("\n"))
         return code

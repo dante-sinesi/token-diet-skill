@@ -31,6 +31,7 @@ import re
 import sys
 
 import guard
+import modo
 import terminal
 import version
 
@@ -312,7 +313,7 @@ def main(argv):
     original = read_raw(source)
     before = tokens(original)
     after = tokens(result.text)
-    if not guard.never_worse(original, result.text):
+    if not guard.never_worse(original, result.text, modo.profile_value(modo.project_root(), "min_gain")):
         if args.stdout:
             print(original, end="")
         else:
