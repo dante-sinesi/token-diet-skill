@@ -40,8 +40,8 @@ Every script lives in `token-diet/scripts/` and answers `--version`. The options
 | `texto.py check \| compare OLD NEW` | Documents above their line cap, paragraphs repeated between documents, and what a moved or trimmed text lost | `--root`, `--min-chars`, `--json` |
 | `comentarios.py [PATH...]` | Reports comment noise (says what the code says, commented-out code, decoration), optionally only on changed lines; never edits | `--ext`, `--max`, `--json`, `--changed`, `--base` |
 | `estimar.py [PATH...]` | Estimates the token cost of reading paths before spending it | `--depth`, `--top`, `--budget`, `--json` |
-| `impacto.py SYMBOL` | Where a symbol is defined and used, and what similar already exists | `--root`, `--max-files`, `--json` |
-| `contexto.py` | Case file of a change: what it touches, who uses it, what to look at first | `--staged`, `--base`, `--head`, `--root`, `--json` |
+| `impacto.py SYMBOL` | Where a symbol is defined and used, and what similar already exists; `--exists WORDS` finds definitions that share words | `--root`, `--max-files`, `--json`, `--exists` |
+| `contexto.py` | Case file of a change, of some files as they are, or of a Pull Request: what it touches, who uses it, what to look at first | `--staged`, `--base`, `--head`, `--files`, `--pr`, `--root`, `--json` |
 | `duplicados.py [PATH...]` | Repeated blocks of code | `--min-lines`, `--max`, `--ext`, `--json` |
 | `relevar.py [ROOT]` | Inventory of an unfamiliar project | `--top`, `--out`, `--json` |
 | `indexar_docs.py build \| query TERMS \| note show\|write` | Index of documents and code with the cost of opening each result; continuity note with a token cap | `--root`, `--limit`, `--text`, `--quiet` |

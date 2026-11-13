@@ -14,8 +14,8 @@ Every script answers `--version`. Options listed here are stable inside a major 
 | `texto.py check \| compare OLD NEW` | Documents above their line cap (path patterns in `.token-diet/config.json`, `document_limits`), paragraphs repeated between documents, and what a moved or trimmed text lost (headings, inline code, URLs, paths, numbers); `token-diet-ignore` skips | `--root`, `--min-chars`, `--json` |
 | `comentarios.py PATH...` | Reports comments that say what the code says, commented-out code and decoration; skips directives, licenses, TODO and `token-diet-ignore`; `--changed` judges only the lines added or modified since `--base`; never edits | `--ext`, `--max`, `--json`, `--changed`, `--base` |
 | `estimar.py PATH...` | Token cost of reading paths, by folder; `--budget` exits 1 when over | `--depth`, `--top`, `--budget`, `--json` |
-| `impacto.py SYMBOL` | Definition, uses and similar existing names | `--root`, `--max-files`, `--json` |
-| `contexto.py` | Case file of a change: files, symbols, users, what to look at first, warnings | `--staged`, `--base`, `--head`, `--root`, `--json` |
+| `impacto.py SYMBOL` | Definition, uses and similar existing names; `--exists WORDS` lists the definitions whose names share words (plurals, accents, camelCase and snake_case ignored): does something like it already exist? | `--root`, `--max-files`, `--json`, `--exists` |
+| `contexto.py` | Case file of a change: files, symbols, users, what to look at first, warnings; `--files FILE...` for files as they are (no diff), `--pr N` for a GitHub Pull Request (needs gh) | `--staged`, `--base`, `--head`, `--files`, `--pr`, `--root`, `--json` |
 | `duplicados.py PATH...` | Repeated blocks of code | `--min-lines`, `--max`, `--ext`, `--json` |
 | `relevar.py ROOT` | Inventory of an unfamiliar project: languages, folders by weight, entry points, manifests, tests and their tools, CI, documentation, git state | `--top`, `--out`, `--json` |
 | `indexar_docs.py build \| query TERMS \| note show\|write` | Index of documents and code with the cost of opening each result; continuity note with a token cap | `--root`, `--limit`, `--text`, `--quiet` |
