@@ -1,6 +1,6 @@
 # Images: saving versus no skill
 
-**Result: −39% to 23%** (minimum to maximum over 7 cases, net of the skill's own cost).
+**Result: −21% to 32%** (minimum to maximum over 7 cases, net of the skill's own cost).
 
 **Target (expected, not a result):** 0% to 57%. Basis: ceiling from pixels / 750: 1024 px against the 1568 px API cap.
 
@@ -20,15 +20,15 @@ Seven image sizes from 640x480 to 4000x3000 px.
 | 640x480 px | 410 | 489 | −20% |
 | 800x600 px | 640 | 719 | −13% |
 | 1024x768 px | 1,049 | 1,128 | −8% |
-| 1200x800 px | 1,280 | 1,775 | −39% |
-| 1568x1045 px | 2,185 | 1,774 | 18% |
-| 3000x2000 px | 2,185 | 1,775 | 18% |
-| 4000x3000 px | 2,459 | 1,891 | 23% |
+| 1200x800 px | 1,280 | 1,537 | −21% |
+| 1568x1045 px | 2,185 | 1,536 | 29% |
+| 3000x2000 px | 2,185 | 1,537 | 29% |
+| 4000x3000 px | 2,459 | 1,653 | 32% |
 
 ## Why this measurement can be trusted
 
 - **Both sides come from real files and real tool output.** The "without the skill" figure is the size of the input Claude would read; the "with the skill" figure is the size of what the tool printed for that same input. Nothing is modeled except the token estimate itself.
-- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (576 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
+- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (338 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
 - **The "no skill" side uses no resource of the skill at all.** It is a plain read, with no conversion, no summary and no index.
 - **Every case is listed, including the ones where the skill loses.** The range is the minimum and the maximum of all the cases, rounded down.
 - **The inputs are fixed and described**, so the numbers do not depend on a model's sampling and can be recomputed.

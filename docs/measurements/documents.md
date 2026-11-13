@@ -1,6 +1,6 @@
 # Documents (HTML): saving versus no skill
 
-**Result: 54% to 68%** (minimum to maximum over 40 cases, net of the skill's own cost).
+**Result: 57% to 70%** (minimum to maximum over 40 cases, net of the skill's own cost).
 
 **Target (expected, not a result):** 50% to 90%. Basis: target for styled HTML, PDF and Word.
 
@@ -17,51 +17,51 @@ Real HTML pages of the Python 3.12 documentation (library section, between 3 KB 
 
 | Case | Without the skill (tokens) | With the skill (tokens) | Saving |
 |---|---:|---:|---:|
-| 2to3.html | 19,595 | 6,434 | 67% |
-| archiving.html | 5,839 | 2,203 | 62% |
-| asyncio-exceptions.html | 5,880 | 2,110 | 64% |
-| asyncio-queue.html | 9,664 | 3,337 | 65% |
-| atexit.html | 7,696 | 2,785 | 63% |
-| bisect.html | 12,538 | 3,938 | 68% |
-| cmath.html | 12,699 | 4,439 | 65% |
-| collections.html | 50,383 | 17,022 | 66% |
-| constants.html | 7,430 | 2,769 | 62% |
-| csv.html | 23,912 | 8,358 | 65% |
-| datatypes.html | 8,507 | 3,014 | 64% |
-| dialog.html | 12,510 | 4,057 | 67% |
-| email.contentmanager.html | 10,978 | 4,196 | 61% |
-| email.html | 9,262 | 4,194 | 54% |
-| ensurepip.html | 7,678 | 2,937 | 61% |
-| fileformats.html | 5,047 | 1,811 | 64% |
-| functional.html | 4,596 | 1,660 | 63% |
-| glob.html | 8,807 | 3,004 | 65% |
-| html.entities.html | 5,317 | 1,871 | 64% |
-| http.server.html | 20,956 | 8,905 | 57% |
-| importlib.resources.abc.html | 9,165 | 3,667 | 59% |
-| ipaddress.html | 36,801 | 14,120 | 61% |
-| locale.html | 24,517 | 9,113 | 62% |
-| markup.html | 7,213 | 2,837 | 60% |
-| modules.html | 5,850 | 2,178 | 62% |
-| nis.html | 5,931 | 2,136 | 63% |
-| os.path.html | 19,602 | 7,367 | 62% |
-| pipes.html | 7,089 | 2,394 | 66% |
-| profile.html | 23,314 | 9,722 | 58% |
-| python.html | 8,320 | 3,196 | 61% |
-| resource.html | 14,015 | 5,184 | 63% |
-| selectors.html | 12,505 | 4,501 | 64% |
-| sndhdr.html | 6,747 | 2,292 | 66% |
-| statistics.html | 37,555 | 13,208 | 64% |
-| superseded.html | 5,165 | 1,739 | 66% |
-| tabnanny.html | 5,576 | 1,987 | 64% |
-| textwrap.html | 13,973 | 5,068 | 63% |
-| tkinter.font.html | 7,122 | 2,422 | 65% |
-| tokenize.html | 11,835 | 4,528 | 61% |
-| types.html | 20,210 | 7,065 | 65% |
+| 2to3.html | 19,595 | 6,196 | 68% |
+| archiving.html | 5,839 | 1,965 | 66% |
+| asyncio-exceptions.html | 5,880 | 1,872 | 68% |
+| asyncio-queue.html | 9,664 | 3,099 | 67% |
+| atexit.html | 7,696 | 2,547 | 66% |
+| bisect.html | 12,538 | 3,700 | 70% |
+| cmath.html | 12,699 | 4,201 | 66% |
+| collections.html | 50,383 | 16,784 | 66% |
+| constants.html | 7,430 | 2,531 | 65% |
+| csv.html | 23,912 | 8,120 | 66% |
+| datatypes.html | 8,507 | 2,776 | 67% |
+| dialog.html | 12,510 | 3,819 | 69% |
+| email.contentmanager.html | 10,978 | 3,958 | 63% |
+| email.html | 9,262 | 3,956 | 57% |
+| ensurepip.html | 7,678 | 2,699 | 64% |
+| fileformats.html | 5,047 | 1,573 | 68% |
+| functional.html | 4,596 | 1,422 | 69% |
+| glob.html | 8,807 | 2,766 | 68% |
+| html.entities.html | 5,317 | 1,633 | 69% |
+| http.server.html | 20,956 | 8,667 | 58% |
+| importlib.resources.abc.html | 9,165 | 3,429 | 62% |
+| ipaddress.html | 36,801 | 13,882 | 62% |
+| locale.html | 24,517 | 8,875 | 63% |
+| markup.html | 7,213 | 2,599 | 63% |
+| modules.html | 5,850 | 1,940 | 66% |
+| nis.html | 5,931 | 1,898 | 67% |
+| os.path.html | 19,602 | 7,129 | 63% |
+| pipes.html | 7,089 | 2,156 | 69% |
+| profile.html | 23,314 | 9,484 | 59% |
+| python.html | 8,320 | 2,958 | 64% |
+| resource.html | 14,015 | 4,946 | 64% |
+| selectors.html | 12,505 | 4,263 | 65% |
+| sndhdr.html | 6,747 | 2,054 | 69% |
+| statistics.html | 37,555 | 12,970 | 65% |
+| superseded.html | 5,165 | 1,501 | 70% |
+| tabnanny.html | 5,576 | 1,749 | 68% |
+| textwrap.html | 13,973 | 4,830 | 65% |
+| tkinter.font.html | 7,122 | 2,184 | 69% |
+| tokenize.html | 11,835 | 4,290 | 63% |
+| types.html | 20,210 | 6,827 | 66% |
 
 ## Why this measurement can be trusted
 
 - **Both sides come from real files and real tool output.** The "without the skill" figure is the size of the input Claude would read; the "with the skill" figure is the size of what the tool printed for that same input. Nothing is modeled except the token estimate itself.
-- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (576 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
+- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (338 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
 - **The "no skill" side uses no resource of the skill at all.** It is a plain read, with no conversion, no summary and no index.
 - **Every case is listed, including the ones where the skill loses.** The range is the minimum and the maximum of all the cases, rounded down.
 - **The inputs are fixed and described**, so the numbers do not depend on a model's sampling and can be recomputed.
