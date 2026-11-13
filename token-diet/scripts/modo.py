@@ -29,6 +29,7 @@ import version
 ENV_DIRECT = "TOKEN_DIET_LECTURA_DIRECTA"
 ENV_DEBUG = "TOKEN_DIET_HOOK_DEPURAR"
 REPEAT_AT = 3
+MAX_BLOCK_KEYS = 500
 PROFILES = {
     "light": {"image_px": 1568, "generated_min_bytes": 50_000, "read_cap_lines": 1000, "min_gain": 0.10},
     "standard": {"image_px": 1024, "generated_min_bytes": 20_000, "read_cap_lines": 400, "min_gain": 0.05},
@@ -117,6 +118,8 @@ def register_block(root, key):
     """Counts a block for `key` and returns how many times it happened."""
     config = load_config(root)
     config["blocks"][key] = config["blocks"].get(key, 0) + 1
+    while len(config["blocks"]) > MAX_BLOCK_KEYS:
+        del config["blocks"][next(iter(config["blocks"]))]
     save_config(root, config)
     return config["blocks"][key]
 
