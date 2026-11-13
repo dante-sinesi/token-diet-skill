@@ -1,6 +1,6 @@
 # Fixed context: saving versus no skill
 
-**Result: −35% to 41%** (minimum to maximum over 2 cases, net of the skill's own cost).
+**Result: −37% to 41%** (minimum to maximum over 2 cases, net of the skill's own cost).
 
 **Target (expected, not a result):** 0% to 30%. Basis: target: trimming what is over the limits.
 
@@ -17,8 +17,8 @@ Two synthetic setups: a lean one (nothing over the limits) and a bloated one (CL
 
 | Case | Input fingerprint | Without the skill (tokens) | With the skill (tokens) | Saving |
 |---|---|---:|---:|---:|
-| lean setup | 399b309539 | 1,594 | 2,151 | −35% |
-| bloated setup | e7f9ec8a16 | 10,281 | 5,980 | 41% |
+| lean setup | 399b309539 | 1,594 | 2,175 | −37% |
+| bloated setup | e7f9ec8a16 | 10,281 | 6,006 | 41% |
 
 ## Evidence
 
@@ -27,7 +27,7 @@ Two synthetic setups: a lean one (nothing over the limits) and a bloated one (CL
 | Basis of the result | benchmark counterfactual: the same inputs read without and with the skill |
 | Basis of the token counts | inferred: characters divided by 4 for text, pixels divided by 750 for images; not a provider count |
 | Inputs | listed above, each with a fingerprint (first 10 characters of the SHA-256 of the exact input) |
-| Code revision | d055cb2 |
+| Code revision | f61dcb8 |
 | Quality check | not run: task success was not tested; 0 of 0 tasks checked |
 | Failures and excluded cases | none excluded; all 2 cases are listed, losses included |
 | Price | not applicable: no money figure is claimed (unpriced) |

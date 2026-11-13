@@ -94,6 +94,23 @@ def repo_skills(repo):
     return skills
 
 
+def settings_counts(home, root):
+    """Hooks and permission rules that load with every session, from the user and project settings files."""
+    hooks = permissions = 0
+    for path in (pathlib.Path(home) / ".claude" / "settings.json", pathlib.Path(root) / ".claude" / "settings.json",
+                 pathlib.Path(root) / ".claude" / "settings.local.json"):
+        text = _read(path)
+        try:
+            data = json.loads(text) if text else {}
+        except ValueError:
+            continue
+        for entries in (data.get("hooks") or {}).values():
+            hooks += sum(len(e.get("hooks", [])) for e in entries if isinstance(e, dict))
+        perms = data.get("permissions") or {}
+        permissions += sum(len(perms.get(kind, [])) for kind in ("allow", "deny", "ask"))
+    return {"hooks": hooks, "permission_rules": permissions}
+
+
 def memory_index(home, root):
     slug = re.sub(r"[^A-Za-z0-9]", "-", str(root))
     return pathlib.Path(home) / ".claude" / "projects" / slug / "memory" / "MEMORY.md"
@@ -142,12 +159,18 @@ def _audit(root, home, repo):
             problems.append(f'skill {skill["name"]}: description has {len(skill["description"])} characters (limit {DESC_MAX_CHARS})')
         if skill["body_lines"] > BODY_MAX_LINES or skill["body_tokens"] > BODY_MAX_TOKENS:
             problems.append(f'skill {skill["name"]}: body has {skill["body_lines"]} lines and ~{skill["body_tokens"]:,} tokens (limits {BODY_MAX_LINES} / {BODY_MAX_TOKENS:,})')
+    claude_total, claude_files = 0, 0
     for path in (home / ".claude" / "CLAUDE.md", root / "CLAUDE.md", root / "CLAUDE.local.md"):
         text = _read(path)
         if text is not None:
-            fixed("claude_md", str(path.name if path.parent == root else "~/.claude/CLAUDE.md"), text)
+            label = str(path.name if path.parent == root else "~/.claude/CLAUDE.md")
+            fixed("claude_md", label, text)
+            claude_total += tokens(text)
+            claude_files += 1
             if tokens(text) > CLAUDE_MAX_TOKENS:
-                problems.append(f"{path.name}: ~{tokens(text):,} tokens (limit {CLAUDE_MAX_TOKENS:,})")
+                problems.append(f"{label}: ~{tokens(text):,} tokens (limit {CLAUDE_MAX_TOKENS:,})")
+    if claude_files > 1 and claude_total > CLAUDE_MAX_TOKENS:
+        problems.append(f"CLAUDE.md files add up to ~{claude_total:,} tokens (limit {CLAUDE_MAX_TOKENS:,}); they load together every session")
     text = _read(memory_index(home, root))
     if text is not None:
         fixed("memory", "MEMORY.md", text)
@@ -160,12 +183,14 @@ def _audit(root, home, repo):
     servers = mcp_servers(home, root)
     if len(servers) > MCP_MAX:
         problems.append(f"{len(servers)} MCP servers (limit {MCP_MAX}); their tool definitions are not counted here")
+    settings = settings_counts(home, root)
     total = sum(item["tokens"] for item in items)
     ranked = sorted(items, key=lambda i: i["tokens"], reverse=True)
     return {
         "fixed_tokens": total,
         "items": items,
         "mcp_servers": servers,
+        "settings": settings,
         "problems": problems,
         "trim_first": [{"label": i["label"], "tokens": i["tokens"]} for i in ranked[:3]],
         "skills": [{"name": s["name"], "body_tokens": s["body_tokens"], "body_lines": s["body_lines"]} for s in skills.values()],
@@ -187,7 +212,9 @@ def render(report):
     names = {"skill": "skills", "claude_md": "CLAUDE.md", "memory": "memory index", "always_loaded": "always-loaded files"}
     parts = ", ".join(f"{names[k]} ~{v:,}" for k, v in by_kind.items())
     lines = [f"Fixed cost per session: ~{report['fixed_tokens']:,} tokens" + (f" ({parts})" if parts else "")]
-    lines.append(f"MCP servers: {len(report['mcp_servers'])} (tool definitions not counted)")
+    settings = report.get("settings", {})
+    lines.append(f"Settings: {settings.get('hooks', 0)} hooks, {settings.get('permission_rules', 0)} permission rules, "
+                 f"{len(report['mcp_servers'])} MCP servers (tool definitions not counted)")
     if report["repo_effect"]:
         lines.append(f"--repo: the repository skills add ~{report['repo_effect']['fixed_tokens_added']:,} fixed tokens")
     if report["problems"]:
@@ -195,6 +222,9 @@ def render(report):
         lines += [f"  - {problem}" for problem in report["problems"]]
     else:
         lines.append("Nothing over the limits.")
+    heavy = sorted(report.get("skills", []), key=lambda s: -s["body_tokens"])[:3]
+    if heavy:
+        lines.append("Heaviest when activated: " + ", ".join(f"{s['name']} ~{s['body_tokens']:,}" for s in heavy))
     if report["trim_first"]:
         lines.append("Largest fixed items: " + ", ".join(f"{t['label']} ~{t['tokens']:,}" for t in report["trim_first"]))
     return "\n".join(lines)
