@@ -46,7 +46,7 @@ Every script lives in `token-diet/scripts/` and answers `--version`. The options
 | `relevar.py [ROOT]` | Inventory of an unfamiliar project | `--top`, `--out`, `--json` |
 | `indexar_docs.py build \| query TERMS \| note show\|write` | Index of documents and code with the cost of opening each result; continuity note with a token cap | `--root`, `--limit`, `--text`, `--quiet` |
 | `modo.py allow PATTERN \| show \| profile [light\|standard\|strict]` | Emergency exit for the read hook; diet profile that sets how strict the thresholds are (standard by default) | `profile` |
-| `instalar.py install \| check \| uninstall` (repository root) | Installs the skill and its hooks, checks for drift, removes both | `--home`, `--no-note-hook` |
+| `instalar.py install \| check \| status \| uninstall` (repository root) | Installs the skill and its hooks, checks for drift, shows what is on and the next step, removes both | `--home`, `--no-note-hook`, `--dry-run` |
 
 ## Install
 
@@ -56,6 +56,6 @@ To make the conversion mandatory and the continuity note automatic, install the 
 python instalar.py install
 ```
 
-It copies the skill to `~/.claude/skills/token-diet/` and registers two hooks in `~/.claude/settings.json` (a backup is kept and the rest of the file is untouched): one blocks a `Read` of a PDF, Office document, image larger than 1024 px, or big lockfile or generated file and gives the exact command; the other loads the continuity note at the start of a session. `python instalar.py check` says whether the installed copy still matches this repository and `python instalar.py uninstall` removes both.
+It copies the skill to `~/.claude/skills/token-diet/` and registers two hooks in `~/.claude/settings.json` (a backup is kept and the rest of the file is untouched; `--dry-run` shows every change without making it): one blocks a `Read` of a PDF, Office document, image larger than 1024 px, or big lockfile or generated file and gives the exact command; the other loads the continuity note at the start of a session. `python instalar.py check` says whether the installed copy still matches this repository and `python instalar.py uninstall` removes both.
 
 Emergency exits: `python token-diet/scripts/modo.py allow PATTERN` for one file, or `TOKEN_DIET_LECTURA_DIRECTA=1` for everything. A broken hook allows the read and logs the error in `.token-diet/hook-errors.log` (`TOKEN_DIET_HOOK_DEPURAR=1` shows it).

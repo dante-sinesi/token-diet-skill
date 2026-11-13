@@ -1,9 +1,10 @@
 """Installs Token Diet as a Claude Code skill and registers its hooks.
 
 Usage:
-  python instalar.py install [--home DIR] [--no-note-hook]
+  python instalar.py install [--home DIR] [--no-note-hook] [--dry-run]
   python instalar.py check [--home DIR]
-  python instalar.py uninstall [--home DIR]
+  python instalar.py status [--home DIR]
+  python instalar.py uninstall [--home DIR] [--dry-run]
 
 install    copies token-diet/ to <home>/.claude/skills/token-diet/, writes a manifest
            (where it came from and a hash of every file) and registers two hooks in
@@ -16,7 +17,12 @@ install    copies token-diet/ to <home>/.claude/skills/token-diet/, writes a man
            Running it again is safe. A settings file that is not valid JSON is never touched.
 check      says whether the installed copy still matches the repository it came from and
            whether the hooks are registered. Exit code 1 if something drifted or is missing.
+status     shows what is on (versions, hooks) and the next step.
 uninstall  removes the skill and its hooks (same backup rule).
+
+--dry-run shows every action without changing anything. The installed hook checks its own files against
+the manifest each time it runs and writes a line to .token-diet/hook-errors.log if one was edited; it
+keeps working (never blocks).
 """
 import argparse
 import datetime
