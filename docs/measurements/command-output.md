@@ -1,0 +1,44 @@
+# Command output: saving versus no skill
+
+**Result: −98% to 99%** (minimum to maximum over 10 cases, net of the skill's own cost).
+
+**Target (expected, not a result):** 50% to 99%. Basis: earlier small samples: filtered log 93%, test summary about 99% (578 tokens against about 44,600).
+
+## What was compared
+
+- **Without the skill:** Claude reads the whole output of a log or of a test or build run.
+- **With the skill:** Logs are filtered to warnings and errors with context; test and build runs are summarized to the failing lines and the closing summary.
+
+## Inputs
+
+Logs of 54 to 10,004 lines with one error and its stack trace; passing and failing test runs of 100, 1,000 and 5,000 lines.
+
+## Cases
+
+| Case | Without the skill (tokens) | With the skill (tokens) | Saving |
+|---|---:|---:|---:|
+| log, 54 lines | 685 | 738 | −8% |
+| log, 504 lines | 6,623 | 740 | 88% |
+| log, 2,004 lines | 26,705 | 741 | 97% |
+| log, 10,004 lines | 134,483 | 742 | 99% |
+| passing test run, 100 lines | 379 | 748 | −98% |
+| failing test run, 100 lines | 396 | 758 | −92% |
+| passing test run, 1,000 lines | 3,979 | 753 | 81% |
+| failing test run, 1,000 lines | 3,996 | 762 | 80% |
+| passing test run, 5,000 lines | 20,979 | 756 | 96% |
+| failing test run, 5,000 lines | 20,996 | 765 | 96% |
+
+## Why this measurement can be trusted
+
+- **Both sides come from real files and real tool output.** The "without the skill" figure is the size of the input Claude would read; the "with the skill" figure is the size of what the tool printed for that same input. Nothing is modeled except the token estimate itself.
+- **The skill's own cost is charged in full, in every case.** Each case adds the skill description (79 tokens), the body of `SKILL.md` (576 tokens), the command that was run and, when the read hook intervenes, its block message. In a real session the description and the body are paid once, so real savings are higher than these.
+- **The "no skill" side uses no resource of the skill at all.** It is a plain read, with no conversion, no summary and no index.
+- **Every case is listed, including the ones where the skill loses.** The range is the minimum and the maximum of all the cases, rounded down.
+- **The inputs are fixed and described**, so the numbers do not depend on a model's sampling and can be recomputed.
+
+## Limits
+
+- Tokens are estimated (characters divided by 4 for text, pixels divided by 750 for images), not counted with Anthropic's tokenizer, so each figure carries roughly a 30% margin. They are good for comparing, not for billing.
+- Task success was not measured with agents. A mechanic that lowered success would not be accepted; this report only covers the tokens.
+- The inputs are samples, partly synthetic. Real projects will differ.
+- A cause far from the error line can be filtered out: the tool says how to read the original by line range. That risk was tested with one planted case only.
