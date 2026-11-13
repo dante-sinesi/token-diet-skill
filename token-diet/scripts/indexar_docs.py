@@ -3,7 +3,7 @@
 Usage:
   python indexar_docs.py build [PATH ...] [--root DIR]
   python indexar_docs.py query TERM [TERM ...] [--limit N] [--root DIR]
-  python indexar_docs.py note show|write [--text TEXT] [--root DIR]     (write reads stdin without --text)
+  python indexar_docs.py note show [--quiet] | write [--text TEXT] [--root DIR]     (write reads stdin without --text)
 
 build   indexes documents (Markdown and text: every section with its line range) and the
         functions and classes of code files, plus links between documents. The index lives
@@ -13,6 +13,9 @@ query   ranks the sections and symbols that answer the terms and, for each one, 
         tokens of opening that section and the whole file, so you open only what is worth it.
 note    the continuity note: one file (.token-diet/continuity.md) with a token cap, so a new
         session continues without re-explaining the project. Writing over the cap fails.
+        "show --quiet" prints nothing when there is no note (what the session-start hook uses).
+
+Without --root the project is $CLAUDE_PROJECT_DIR or the current folder.
 
 A line containing "token-diet-ignore" is left out of the concepts; a document with that
 marker in its first 5 lines is not indexed. Tokens are characters / 4.
@@ -270,11 +273,12 @@ def main(argv, stdin=None):
     parser = argparse.ArgumentParser(description="Index and concept map of a project.")
     parser.add_argument("command", choices=["build", "query", "note"])
     parser.add_argument("rest", nargs="*")
-    parser.add_argument("--root", default=".")
+    parser.add_argument("--root")
     parser.add_argument("--limit", type=int, default=5)
     parser.add_argument("--text")
+    parser.add_argument("--quiet", action="store_true")
     args = parser.parse_args(argv)
-    root = pathlib.Path(args.root).resolve()
+    root = pathlib.Path(args.root).resolve() if args.root else modo.project_root()
     if args.command == "build":
         result = build(root, args.rest or None)
         print(f"indexed {result['entries']} entries in {result['files']} files ({result['reused']} unchanged) -> {index_dir(root) / 'index.md'}")
@@ -289,7 +293,8 @@ def main(argv, stdin=None):
     action = args.rest[0] if args.rest else ""
     if action == "show":
         text = note_show(root)
-        print(text if text else "No continuity note yet.")
+        if text or not args.quiet:
+            print(text if text else "No continuity note yet.")
         return 0
     if action == "write":
         text = args.text if args.text is not None else (stdin or sys.stdin).read()
