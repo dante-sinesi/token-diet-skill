@@ -38,6 +38,7 @@ Every script lives in `token-diet/scripts/` and answers `--version`. The options
 | `compactar.py FILE` | Compacts JSON, CSV, logs, lockfiles and generated files and says what it may have lost | `--mode`, `--sample`, `--context`, `--out`, `--stdout`, `--lines A-B` |
 | `resumir.py -- COMMAND` | Runs a test, lint or build command and returns only the lines that matter | `--max-lines`, `--timeout`, `--out` |
 | `texto.py check \| compare OLD NEW` | Documents above their line cap, paragraphs repeated between documents, and what a moved or trimmed text lost | `--root`, `--min-chars`, `--json` |
+| `comentarios.py [PATH...]` | Reports comment noise (says what the code says, commented-out code, decoration); never edits | `--ext`, `--max`, `--json` |
 | `estimar.py [PATH...]` | Estimates the token cost of reading paths before spending it | `--depth`, `--top`, `--budget`, `--json` |
 | `impacto.py SYMBOL` | Where a symbol is defined and used, and what similar already exists | `--root`, `--max-files`, `--json` |
 | `contexto.py` | Case file of a change: what it touches, who uses it, what to look at first | `--staged`, `--base`, `--head`, `--root`, `--json` |
