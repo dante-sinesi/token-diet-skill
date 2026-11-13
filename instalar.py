@@ -124,7 +124,27 @@ def write_settings(home, settings, original):
     path.write_text(new_text, encoding="utf-8")
 
 
-def install(home, note_hook=True):
+def plan_install(home, note_hook=True):
+    """What install would do, without doing it."""
+    if not SOURCE.is_dir():
+        raise InstallError(f"{SOURCE} not found: run the installer from the repository")
+    settings, original = load_settings(home)
+    target = skill_dir(home)
+    actions = [f"{'replace' if target.exists() else 'copy'} {len(file_hashes(SOURCE))} files {'in' if target.exists() else 'to'} {target}",
+               f"write the manifest (version {source_version()}) in {target / MANIFEST}"]
+    previous = remove_ours(json.loads(json.dumps(settings)))
+    if previous:
+        actions.append(f"replace {previous} earlier Token Diet hook registration(s) in {settings_path(home)}")
+    for event, (matcher, command) in hook_commands(home, note_hook).items():
+        actions.append(f"register {event}{' (' + matcher + ')' if matcher else ''}: {command}")
+    if original is not None:
+        actions.append(f"back up {settings_path(home)} to {settings_path(home).with_name(BACKUP)} and keep everything else in it")
+    return actions
+
+
+def install(home, note_hook=True, dry_run=False):
+    if dry_run:
+        return {"dry_run": True, "actions": plan_install(home, note_hook)}
     if not SOURCE.is_dir():
         raise InstallError(f"{SOURCE} not found: run the installer from the repository")
     settings, original = load_settings(home)
@@ -151,8 +171,11 @@ def install(home, note_hook=True):
     return {"files": len(file_hashes(target)), "hooks": sorted(hooks), "target": target}
 
 
-def uninstall(home):
+def uninstall(home, dry_run=False):
     settings, original = load_settings(home)
+    if dry_run:
+        removed = remove_ours(json.loads(json.dumps(settings)))
+        return {"dry_run": True, "skill_removed": skill_dir(home).exists(), "hooks_removed": removed}
     removed = remove_ours(settings)
     if original is not None:
         write_settings(home, settings, original)
@@ -204,14 +227,54 @@ def check(home, note_hook=True):
     return problems
 
 
+def status(home):
+    """What is on, and the next step."""
+    manifest_file = skill_dir(home) / MANIFEST
+    if not manifest_file.is_file():
+        return {"installed": False, "repository_version": source_version(), "next": "run: python instalar.py install"}
+    manifest = json.loads(manifest_file.read_text(encoding="utf-8"))
+    problems = check(home)
+    settings, _ = load_settings(home)
+    registered = sorted({event for event, entries in (settings.get("hooks") or {}).items() for entry in entries
+                         for h in entry.get("hooks", []) if isinstance(h, dict) and _is_ours(h.get("command", ""))})
+    if problems:
+        nxt = "run: python instalar.py install (the installed copy or its hooks drifted; see check)"
+    else:
+        nxt = "nothing to do"
+    return {"installed": True, "installed_version": manifest.get("version", "unknown"), "repository_version": source_version(),
+            "hooks": registered, "problems": problems, "next": nxt}
+
+
+def render_status(info):
+    if not info["installed"]:
+        return f"not installed (repository version {info['repository_version']}); {info['next']}"
+    lines = [f"installed version: {info['installed_version']}; repository version: {info['repository_version']}",
+             "hooks: " + (", ".join(info["hooks"]) if info["hooks"] else "none")]
+    lines += [f"problem: {p}" for p in info["problems"]]
+    lines.append(f"next: {info['next']}")
+    return "\n".join(lines)
+
+
 def main(argv):
     parser = argparse.ArgumentParser(description="Install Token Diet as a Claude Code skill.")
-    parser.add_argument("command", choices=["install", "check", "uninstall"])
+    parser.add_argument("command", choices=["install", "check", "uninstall", "status"])
     parser.add_argument("--version", action="version", version=f"token-diet {source_version()}")
     parser.add_argument("--home", default=str(pathlib.Path.home()))
     parser.add_argument("--no-note-hook", action="store_true")
+    parser.add_argument("--dry-run", action="store_true", help="show what would change without changing anything")
     args = parser.parse_args(argv)
     try:
+        if args.command == "status":
+            print(render_status(status(args.home)))
+            return 0
+        if args.command == "install" and args.dry_run:
+            result = install(args.home, not args.no_note_hook, dry_run=True)
+            print("dry run, nothing was changed:\n" + "\n".join(f"  - {a}" for a in result["actions"]))
+            return 0
+        if args.command == "uninstall" and args.dry_run:
+            result = uninstall(args.home, dry_run=True)
+            print(f"dry run, nothing was changed: skill removed: {result['skill_removed']}; hooks removed: {result['hooks_removed']}")
+            return 0
         if args.command == "install":
             result = install(args.home, not args.no_note_hook)
             print(f"installed token-diet {source_version()}: {result['files']} files in {result['target']}")
