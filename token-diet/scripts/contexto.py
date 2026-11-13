@@ -1,15 +1,21 @@
 """Case file for a change: what it touches, who it affects and what to look at first.
 
 Usage: python contexto.py [--staged] [--base REF [--head REF]] [--root DIR] [--json]
+       python contexto.py --files FILE [FILE ...] [--root DIR]
+       python contexto.py --pr NUMBER [--root DIR]
 
 Default: the working tree against HEAD (staged, unstaged and untracked files).
 --staged: only what is staged. --base REF [--head REF]: the changes of a branch since it
-left REF (REF...HEAD). It replaces reading the whole diff: read the files it points to.
+left REF (REF...HEAD). --files: those files as they are (symbols they define and who uses them),
+no diff needed. --pr N: a GitHub Pull Request, read with the gh command (TOKEN_DIET_GH picks another
+executable); it needs gh installed and logged in. It replaces reading the whole diff: read the files it points to.
 """
 import argparse
 import json
+import os
 import pathlib
 import re
+import shlex
 import subprocess
 import sys
 
@@ -75,9 +81,84 @@ def collect(root, staged=False, base=None, head=None):
     return status, counts, symbols
 
 
-def build(root, staged=False, base=None, head=None):
+def parse_patch(text):
+    """Status, counts and defined symbols from a unified diff (the patch of a Pull Request)."""
+    status, counts, symbols, current, in_hunk = {}, {}, {}, None, False
+    for line in text.splitlines():
+        if line.startswith("diff --git "):
+            match = re.match(r"diff --git a/(.+) b/(.+)$", line)
+            current, in_hunk = (match.group(2) if match else None), False
+            if current:
+                status.setdefault(current, "M")
+                counts.setdefault(current, [0, 0])
+        elif not current:
+            continue
+        elif not in_hunk and line.startswith("new file mode"):
+            status[current] = "A"
+        elif not in_hunk and line.startswith("deleted file mode"):
+            status[current] = "D"
+        elif not in_hunk and line.startswith("rename to "):
+            status[current] = "R"
+        elif line.startswith("@@"):
+            in_hunk = True
+            match = HUNK.match(line)
+            name = impacto.defined_name(match.group(1)) if match and match.group(1) else None
+            if name:
+                symbols.setdefault(current, set()).add(name)
+        elif in_hunk and line.startswith("+"):
+            counts[current][0] += 1
+            name = impacto.defined_name(line[1:])
+            if name:
+                symbols.setdefault(current, set()).add(name)
+        elif in_hunk and line.startswith("-"):
+            counts[current][1] += 1
+    return status, {k: tuple(v) for k, v in counts.items()}, symbols
+
+
+def collect_files(root, files):
+    """Files as they are: every line counts as added, the symbols are the definitions they contain."""
+    status, counts, symbols = {}, {}, {}
+    for name in files:
+        path = pathlib.Path(root) / name
+        if not path.is_file():
+            raise RuntimeError(f"{name} is not a file under {root}")
+        text = walk.read_text(path)
+        rel = walk.relative(path, root)
+        status[rel], counts[rel] = "F", (len(text.splitlines()), 0)
+        for line in text.splitlines():
+            found = impacto.defined_name(line)
+            if found:
+                symbols.setdefault(rel, set()).add(found)
+    return status, counts, symbols
+
+
+def collect_pr(root, number):
+    command = shlex.split(os.environ.get("TOKEN_DIET_GH", "gh"), posix=(os.name != "nt"))
+    try:
+        done = subprocess.run([*[c.strip(chr(34)) for c in command], "pr", "diff", str(number), "--patch"], cwd=root,
+                              capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=120)
+    except FileNotFoundError:
+        raise RuntimeError("gh is not installed or not on the PATH: install it and log in, or use --base and --head") from None
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("gh did not answer in time") from None
+    if done.returncode != 0:
+        raise RuntimeError("gh could not read the Pull Request: " + (done.stderr.strip().splitlines() or ["no output"])[-1][:200])
+    if not done.stdout.strip():
+        raise RuntimeError(f"Pull Request {number} has no diff")
+    return parse_patch(done.stdout)
+
+
+def build(root, staged=False, base=None, head=None, files_arg=None, pr=None):
     root = pathlib.Path(root)
-    status, counts, symbols = collect(root, staged, base, head)
+    if files_arg:
+        status, counts, symbols = collect_files(root, files_arg)
+        mode = "files"
+    elif pr:
+        status, counts, symbols = collect_pr(root, pr)
+        mode = "pull request"
+    else:
+        status, counts, symbols = collect(root, staged, base, head)
+        mode = "changes"
     files = []
     for path, code in sorted(status.items()):
         added, removed = counts.get(path, (0, 0))
@@ -99,12 +180,13 @@ def build(root, staged=False, base=None, head=None):
     ranked = sorted((f for f in files if not f["is_test"]), key=score, reverse=True)
     sources = [f for f in files if not f["is_test"] and walk.language_of(f["path"]) in walk.CODE_LANGUAGES]
     warnings = []
-    if sources and not any(f["is_test"] for f in files):
+    if mode != "files" and sources and not any(f["is_test"] for f in files):
         warnings.append("source files changed but no test file changed")
     for f in files:
         if f["status"] == "D":
             warnings.append(f"{f['path']} was deleted: check who still uses it")
     return {
+        "mode": mode,
         "files_changed": len(files),
         "added": sum(f["added"] for f in files),
         "removed": sum(f["removed"] for f in files),
@@ -116,8 +198,13 @@ def build(root, staged=False, base=None, head=None):
 
 def render(report):
     if not report["files"]:
-        return "No changes."
-    lines = [f"{report['files_changed']} files changed, +{report['added']} -{report['removed']}"]
+        return "No changes." if report.get("mode") != "files" else "No files."
+    if report.get("mode") == "files":
+        lines = [f"{report['files_changed']} files as they are, {report['added']} lines"]
+    elif report.get("mode") == "pull request":
+        lines = [f"Pull Request: {report['files_changed']} files changed, +{report['added']} -{report['removed']}"]
+    else:
+        lines = [f"{report['files_changed']} files changed, +{report['added']} -{report['removed']}"]
     for f in report["files"]:
         extra = f"  symbols: {', '.join(f['symbols'])}" if f["symbols"] else ""
         flags = " [risky]" if f["risky"] else ""
@@ -140,9 +227,11 @@ def main(argv):
     parser.add_argument("--head")
     parser.add_argument("--root", default=".")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--files", nargs="+", metavar="FILE", help="those files as they are, no diff")
+    parser.add_argument("--pr", type=int, help="a GitHub Pull Request number (needs gh)")
     args = parser.parse_args(argv)
     try:
-        report = build(args.root, args.staged, args.base, args.head)
+        report = build(args.root, args.staged, args.base, args.head, args.files, args.pr)
     except (RuntimeError, OSError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 1
